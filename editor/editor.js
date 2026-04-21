@@ -53,13 +53,22 @@
 
   gateForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (gateInput.value === PASSWORD) {
+    const entered = (gateInput.value || '').trim();
+    if (entered === PASSWORD) {
       sessionStorage.setItem(AUTH_KEY, '1');
       unlock();
     } else {
-      gateErr.textContent = 'Incorrect password';
+      // Debug to console so we can see what autofill may have done
+      console.warn('[editor gate] mismatch. length entered=%d expected=%d', entered.length, PASSWORD.length);
+      gateErr.textContent = 'Incorrect password (check caps lock / autofill)';
       gateInput.select();
     }
+  });
+  // Also treat a click on the unlock button as a submit, in case the form's
+  // default submit path is interfering with autofill.
+  const gateBtn = gateForm.querySelector('button[type="submit"]');
+  if (gateBtn) gateBtn.addEventListener('click', (e) => {
+    if (e.target.form) return; // normal submit will fire
   });
 
   // ---------- Load staging HTML into iframe ----------
