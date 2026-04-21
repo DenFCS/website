@@ -1,0 +1,147 @@
+/* /editor/editor.css */
+:root {
+  --gold:#C8A84E; --gold-light:#E0C872;
+  --dark:#0D0D0D; --dark-2:#141414; --dark-3:#1A1A1A;
+  --text:#E8E4DC; --muted:#9A9588; --border:#2a2a2a;
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; }
+body {
+  background: var(--dark); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px; line-height: 1.5;
+}
+code { background:#000; padding:1px 5px; border-radius:2px; color:var(--gold); font-size:12px; }
+a { color: var(--gold); }
+
+/* ---------- Password gate ---------- */
+.gate {
+  position:fixed; inset:0; z-index: 10;
+  display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(ellipse at 50% 20%, rgba(200,168,78,0.12), transparent 70%), var(--dark);
+}
+.gate-card {
+  background: var(--dark-2); padding: 40px 36px;
+  border: 1px solid var(--border); border-radius: 4px;
+  width: 360px; max-width: 90vw;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+}
+.gate-title { font-family: "Oswald", sans-serif; font-weight:700; letter-spacing:6px; font-size:28px; text-align:center; }
+.gate-sub { text-align:center; color: var(--muted); letter-spacing:4px; text-transform:uppercase; font-size:12px; margin-top:4px; margin-bottom:24px; }
+.gate-card input, .modal-card input {
+  width:100%; padding:12px; background: var(--dark); color: var(--text);
+  border: 1px solid var(--border); border-radius: 3px; font-size: 14px; outline:none;
+}
+.gate-card input:focus, .modal-card input:focus { border-color: var(--gold); }
+.gate-card button {
+  width:100%; margin-top: 14px; padding: 12px;
+  background: var(--gold); color: var(--dark); border: none; border-radius: 3px;
+  font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  font-size: 13px; cursor: pointer;
+}
+.gate-card button:hover { background: var(--gold-light); }
+.gate-err { color:#e56; font-size:12px; margin-top:12px; text-align:center; min-height:16px; }
+
+/* ---------- Editor shell ---------- */
+.app {
+  display: grid;
+  grid-template-areas:
+    "toolbar toolbar"
+    "sidebar canvas";
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 52px 1fr;
+  height: 100vh;
+}
+.toolbar {
+  grid-area: toolbar;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 16px; background: var(--dark-2); border-bottom: 1px solid var(--border);
+}
+.toolbar-left { display:flex; align-items:center; gap: 14px; }
+.toolbar-status { color: var(--muted); font-size: 12px; }
+.toolbar-right { display:flex; gap: 8px; }
+
+.btn {
+  padding: 8px 14px; border-radius: 3px; border: 1px solid transparent;
+  font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer;
+}
+.btn-primary { background: var(--gold); color: var(--dark); }
+.btn-primary:hover { background: var(--gold-light); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.sidebar {
+  grid-area: sidebar;
+  background: var(--dark-2); border-right: 1px solid var(--border);
+  padding: 20px 16px; overflow-y: auto;
+}
+.sb-block { margin-bottom: 28px; }
+.sb-heading {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 10px;
+}
+.sb-tips { list-style: none; padding: 0; }
+.sb-tips li { padding: 6px 0; color: #d0cdc6; font-size: 13px; line-height: 1.5; border-bottom: 1px dashed var(--border); }
+.sb-tips li:last-child { border: none; }
+.sb-count { font-family: "Oswald", sans-serif; font-size: 40px; color: var(--text); line-height: 1; }
+.sb-count.dirty { color: var(--gold); }
+.sb-note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+.canvas {
+  grid-area: canvas; background: #000; position: relative;
+}
+.canvas iframe {
+  width: 100%; height: 100%; border: 0; display: block; background: #fff;
+}
+
+/* ---------- Inside the iframe (injected) ---------- */
+/* styles live as text in editor.js (INJECTED_CSS) so they land in the iframe doc */
+
+/* ---------- Modal ---------- */
+.modal {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.78); display: flex; align-items: center; justify-content: center;
+}
+.modal[hidden] { display: none; }
+.modal-card {
+  background: var(--dark-2); border: 1px solid var(--gold);
+  border-radius: 4px; padding: 28px 32px; max-width: 560px; width: 92vw;
+}
+.modal-title { font-size: 18px; letter-spacing: 1px; margin-bottom: 8px; }
+.modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+.modal-p { color: #ccc; margin-bottom: 12px; }
+.modal-ol { margin: 0 0 16px 20px; color: #ccc; font-size: 13px; }
+.modal-ol li { margin-bottom: 4px; }
+.modal-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* ---------- Crop stage ---------- */
+.crop-stage { display:flex; justify-content:center; margin: 8px 0 16px; }
+.crop-frame {
+  position: relative; overflow: hidden;
+  background: #000;
+  outline: 2px dashed var(--gold); outline-offset: 2px;
+  cursor: grab;
+  user-select: none;
+}
+.crop-frame:active { cursor: grabbing; }
+.crop-frame img {
+  position: absolute; top: 0; left: 0;
+  max-width: none; pointer-events: none;
+  transform-origin: 0 0;
+}
+.crop-controls { padding: 0 4px; }
+.crop-controls label { display:flex; align-items:center; gap: 10px; font-size: 13px; color: var(--muted); }
+.crop-controls input[type=range] { flex: 1; }
+.crop-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--dark-2); color: var(--text);
+  border: 1px solid var(--gold); padding: 10px 18px; border-radius: 4px;
+  z-index: 200; font-size: 13px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+.toast.err { border-color: #e56; }

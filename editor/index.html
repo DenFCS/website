@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DenFCS — Site Editor</title>
+  <link rel="stylesheet" href="/editor/editor.css" />
+</head>
+<body>
+
+  <!-- Password gate -->
+  <div id="gate" class="gate">
+    <form id="gate-form" class="gate-card" autocomplete="off">
+      <div class="gate-title">DEN × FCS</div>
+      <div class="gate-sub">Site Editor</div>
+      <input type="password" id="gate-input" placeholder="Password" autofocus required />
+      <button type="submit">Unlock</button>
+      <div class="gate-err" id="gate-err"></div>
+    </form>
+  </div>
+
+  <!-- Editor shell -->
+  <div id="app" class="app" hidden>
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <strong>DenFCS Editor</strong>
+        <span class="toolbar-status" id="status">idle</span>
+      </div>
+      <div class="toolbar-right">
+        <button id="btn-reset" class="btn btn-ghost" title="Discard local edits and reload from staging">Discard</button>
+        <button id="btn-preview" class="btn btn-ghost">Preview</button>
+        <button id="btn-push" class="btn btn-primary">Push to Staging &rarr;</button>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sb-block">
+        <div class="sb-heading">How to edit</div>
+        <ul class="sb-tips">
+          <li>Click any <b>text</b> to type directly.</li>
+          <li>Click any <b>image</b> to replace it.</li>
+          <li>If the new image has different dimensions, you'll get a reposition &amp; zoom dialog.</li>
+          <li>Hit <b>Push to Staging</b> when ready. Staging appears at <code>/stagingsite</code>.</li>
+          <li>From staging, use the top bar to <b>Deploy to Production</b>.</li>
+        </ul>
+      </div>
+      <div class="sb-block">
+        <div class="sb-heading">Unsaved changes</div>
+        <div id="dirty-count" class="sb-count">0</div>
+        <div class="sb-note">Your edits live in this browser until you push.</div>
+      </div>
+    </aside>
+
+    <main class="canvas">
+      <iframe id="frame" title="Site editor canvas"></iframe>
+    </main>
+  </div>
+
+  <!-- Image reposition modal -->
+  <div id="crop-modal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="modal-title">Image doesn't match original dimensions</div>
+      <div class="modal-sub" id="crop-info"></div>
+      <div class="crop-stage">
+        <div class="crop-frame" id="crop-frame">
+          <img id="crop-img" alt="" draggable="false" />
+        </div>
+      </div>
+      <div class="crop-controls">
+        <label>Zoom <input type="range" id="crop-zoom" min="100" max="400" value="100" step="1" /></label>
+        <div class="crop-hint">Drag the image to reposition. The box is the exact space on the site.</div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-ghost" id="crop-cancel">Cancel</button>
+        <button class="btn btn-primary" id="crop-ok">Use this crop</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAT prompt modal -->
+  <div id="pat-modal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="modal-title">One-time setup: GitHub token</div>
+      <p class="modal-p">To save your edits, the editor needs a GitHub Personal Access Token. This is stored in your browser only — never sent anywhere else.</p>
+      <ol class="modal-ol">
+        <li>Open <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a></li>
+        <li>Click <b>Generate new token (classic)</b></li>
+        <li>Check the <b>repo</b> scope, set expiration, generate</li>
+        <li>Copy the token (<code>ghp_…</code>) and paste it below</li>
+      </ol>
+      <input type="password" id="pat-input" placeholder="ghp_…" />
+      <div class="modal-btns">
+        <button class="btn btn-ghost" id="pat-cancel">Cancel</button>
+        <button class="btn btn-primary" id="pat-save">Save &amp; continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/editor/editor.js"></script>
+</body>
+</html>
