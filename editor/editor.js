@@ -51,24 +51,28 @@
     unlock();
   }
 
-  gateForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+  function tryUnlock(source) {
     const entered = (gateInput.value || '').trim();
+    console.log('[editor gate] attempt via %s, length=%d', source, entered.length);
     if (entered === PASSWORD) {
       sessionStorage.setItem(AUTH_KEY, '1');
       unlock();
-    } else {
-      // Debug to console so we can see what autofill may have done
-      console.warn('[editor gate] mismatch. length entered=%d expected=%d', entered.length, PASSWORD.length);
-      gateErr.textContent = 'Incorrect password (check caps lock / autofill)';
-      gateInput.select();
+      return true;
     }
-  });
-  // Also treat a click on the unlock button as a submit, in case the form's
-  // default submit path is interfering with autofill.
-  const gateBtn = gateForm.querySelector('button[type="submit"]');
-  if (gateBtn) gateBtn.addEventListener('click', (e) => {
-    if (e.target.form) return; // normal submit will fire
+    console.warn('[editor gate] mismatch. entered length=%d expected=%d', entered.length, PASSWORD.length);
+    gateErr.textContent = 'Incorrect password (check caps lock / autofill)';
+    gateInput.select();
+    return false;
+  }
+
+  gateForm.addEventListener('submit', (e) => { e.preventDefault(); tryUnlock('submit'); });
+  // Also bind directly to button click in case form submission is being
+  // intercepted by the browser's password manager.
+  const gateBtn = document.getElementById('gate-btn');
+  if (gateBtn) gateBtn.addEventListener('click', (e) => { e.preventDefault(); tryUnlock('click'); });
+  // And Enter on the input.
+  gateInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); tryUnlock('enter'); }
   });
 
   // ---------- Load staging HTML into iframe ----------
@@ -80,21 +84,23 @@
       let html = await res.text();
       state.originalHtml = html;
 
-      // Strip banner + base so the editor sees a "clean" page with relative urls
+      // Strip banner only. We keep the <base href="/"> so relative URLs
+      // (images, mp4s, fonts) resolve against the site root rather than /editor/.
+      // Important: this must be present in the srcdoc string BEFORE first render,
+      // otherwise images kick off requests against the wrong base and 404.
       html = html
-        .replace(/<!-- staging-banner-start -->[\s\S]*?<!-- staging-banner-end -->\s*/g, '')
-        .replace(/<!-- staging-base-start -->[\s\S]*?<!-- staging-base-end -->\s*/g, '');
+        .replace(/<!-- staging-banner-start -->[\s\S]*?<!-- staging-banner-end -->\s*/g, '');
 
-      // Write into iframe. Use srcdoc so we can inject fresh instrumentation.
+      // Belt-and-suspenders: if the staging file ever lacked the base tag,
+      // inject one just after <head>.
+      if (!/<base\s/i.test(html)) {
+        html = html.replace(/<head[^>]*>/i, (m) => m + '\n  <base href="/">');
+      }
+
+      // Write into iframe via srcdoc.
       frame.srcdoc = html;
       frame.onload = () => {
         state.iframeDoc = frame.contentDocument;
-        // Ensure relative URLs resolve from site root (since iframe is /editor/)
-        if (!state.iframeDoc.querySelector('base')) {
-          const base = state.iframeDoc.createElement('base');
-          base.href = '/';
-          state.iframeDoc.head.insertBefore(base, state.iframeDoc.head.firstChild);
-        }
         instrumentIframe();
         state.frameReady = true;
         setStatus('ready');

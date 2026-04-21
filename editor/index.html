@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DenFCS — Site Editor</title>
-  <link rel="stylesheet" href="/editor/editor.css" />
+  <link rel="stylesheet" href="/editor/editor.css?v=3" />
 </head>
 <body>
 
   <!-- Password gate -->
   <div id="gate" class="gate">
-    <form id="gate-form" class="gate-card" autocomplete="off">
+    <form id="gate-form" class="gate-card" autocomplete="off" action="javascript:void(0)" method="post">
       <div class="gate-title">DEN × FCS</div>
       <div class="gate-sub">Site Editor</div>
-      <input type="password" id="gate-input" placeholder="Password" autofocus required />
-      <button type="submit">Unlock</button>
+      <input type="password" id="gate-input" placeholder="Password" autofocus required autocomplete="new-password" />
+      <button type="submit" id="gate-btn">Unlock</button>
       <div class="gate-err" id="gate-err"></div>
     </form>
   </div>
@@ -99,6 +99,6 @@
   <!-- Toast -->
   <div id="toast" class="toast" hidden></div>
 
-  <script src="/editor/editor.js"></script>
+  <script src="/editor/editor.js?v=3"></script>
 </body>
 </html>
