@@ -2388,26 +2388,23 @@
       .nav { position: sticky; }
     }
 
-    /* --- Hero: stack videos vertically with landscape aspect so the
-           frames don't feel squished next to the velocity numbers --- */
+    /* --- Hero: keep the overlay effect (text ON videos) but stack the
+           split halves top/bottom and shrink the overall hero so each
+           half looks landscape (not near-square like full-height halves). --- */
     @media (max-width: 768px) {
-      .hero { min-height: auto; display: block; }
-      /* Take hero-bg OUT of absolute positioning so it flows in front of
-         the content stack; videos get a real landscape aspect ratio. */
+      /* Shorter hero so the stacked halves land at a landscape aspect */
+      .hero { min-height: 72vh; }
       .hero-bg {
-        position: relative;
-        inset: auto;
+        /* Stay absolute (fills the hero) — that's what puts the video
+           underneath the text. Just switch from cols to rows. */
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+        grid-template-rows: 1fr 1fr;
       }
-      .hero-half { aspect-ratio: 16 / 9; }
       .hero-half-right { border-left: none; border-top: 1px solid rgba(201, 169, 97, 0.15); }
-      /* Vignette only over the videos, not the content */
-      .hero-vignette { display: none; }
       .hero-content {
-        padding: 40px var(--sp-lg) 40px;
-        min-height: 0;
-        background: var(--n-0);
+        padding: 48px var(--sp-lg) 36px;
+        /* no min-height here: let the natural content height drive,
+           with .hero min-height setting the floor */
       }
       .hero-frame-label { font-size: 9px; letter-spacing: 0.2em; }
       .hero-frame-label.tl, .hero-frame-label.tr { top: 10px; }
