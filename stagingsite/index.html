@@ -2324,6 +2324,164 @@
       white-space: nowrap;
       border: 0;
     }
+
+    /* ============================================================
+       MOBILE REFINEMENTS — added for staging review.
+       All rules are gated behind max-width media queries, so they
+       never affect desktop (>768px) rendering.
+       ============================================================ */
+
+    /* --- Safety: no horizontal scroll --- */
+    html, body { max-width: 100%; overflow-x: hidden; }
+
+    /* --- Mobile nav toggle (hamburger) --- */
+    .nav-toggle {
+      display: none;
+      background: transparent; border: none; padding: 8px; cursor: pointer;
+      width: 40px; height: 40px; align-items: center; justify-content: center;
+      margin-left: auto;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 2px; background: var(--n-1000);
+      position: relative;
+    }
+    .nav-toggle span::before,
+    .nav-toggle span::after {
+      content: ''; position: absolute; left: 0; width: 22px; height: 2px;
+      background: var(--n-1000); transition: transform 0.25s ease, top 0.25s ease;
+    }
+    .nav-toggle span::before { top: -7px; }
+    .nav-toggle span::after  { top:  7px; }
+    .nav-toggle[aria-expanded="true"] span { background: transparent; }
+    .nav-toggle[aria-expanded="true"] span::before { top: 0; transform: rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] span::after  { top: 0; transform: rotate(-45deg); }
+
+    @media (max-width: 900px) {
+      .nav-toggle { display: inline-flex; }
+
+      /* Reveal nav links as a full-width drawer when toggled open */
+      .nav-links {
+        position: absolute; top: 100%; left: 0; right: 0;
+        flex-direction: column; align-items: stretch;
+        background: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--n-200);
+        padding: 8px 0 12px;
+        gap: 0;
+        display: none;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links > a {
+        display: block !important;  /* override existing "display:none" at 900px */
+        padding: 14px var(--sp-lg);
+        font-size: 13px;
+        border-bottom: 1px solid var(--n-200);
+      }
+      .nav-links > a:last-of-type { border-bottom: 0; }
+      .nav-auth {
+        padding: 12px var(--sp-lg) 0;
+        border-left: none; margin-left: 0;
+        justify-content: center;
+      }
+      .nav-auth .btn { width: 100%; padding: 12px; font-size: 12px; }
+      .nav { position: sticky; }
+    }
+
+    /* --- Hero: stack the split videos vertically on phones --- */
+    @media (max-width: 768px) {
+      .hero { min-height: auto; }
+      .hero-bg { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      .hero-half-right { border-left: none; border-top: 1px solid rgba(201, 169, 97, 0.15); }
+      .hero-content {
+        padding: 56px var(--sp-lg) 40px;
+        min-height: 92vh;
+      }
+      .hero-frame-label { font-size: 9px; letter-spacing: 0.2em; }
+      .hero-frame-label.tl, .hero-frame-label.tr { top: 10px; }
+      .hero-frame-label.bl, .hero-frame-label.br { bottom: 10px; }
+      .hero-frame-label.tl, .hero-frame-label.bl { left: 10px; }
+      .hero-frame-label.tr, .hero-frame-label.br { right: 10px; }
+    }
+
+    /* --- Hero radar row: tighten on phones --- */
+    @media (max-width: 768px) {
+      .radar-row { gap: var(--sp-md); }
+      .radar-num { font-size: clamp(56px, 18vw, 96px); }
+      .radar-label { font-size: 9px; letter-spacing: 0.25em; }
+      .radar-unit { font-size: 15px; }
+      .radar-sublabel { font-size: 9px; letter-spacing: 0.22em; }
+      .radar-divider-line { height: 36px; }
+      .radar-divider-text { font-size: 9px; letter-spacing: 0.22em; }
+      .hero-reveal h1 { font-size: 32px; line-height: 36px; }
+      .hero-actions .btn { padding: 12px 18px; font-size: 12px; }
+    }
+
+    /* --- Alumni tabs: enable horizontal scroll on narrow screens
+           so names don't truncate awkwardly --- */
+    @media (max-width: 768px) {
+      .alumni-tabs {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .alumni-tabs::-webkit-scrollbar { display: none; }
+      .alumni-tab {
+        flex: 0 0 auto;
+        min-width: 120px;
+        padding: 14px 12px;
+        scroll-snap-align: start;
+      }
+      .alumni-tab-avatar { width: 40px; height: 40px; }
+      .alumni-tab-name { font-size: 10.5px; line-height: 1.2; text-align: center; }
+      .alumni-panel { padding: var(--sp-xl) var(--sp-lg) 0; }
+      .alumni-info-bio, .alumni-info-quote { font-size: 16px; line-height: 26px; }
+      .alumni-stat-value { font-size: 18px; }
+    }
+
+    /* --- Container padding for 480–768 --- */
+    @media (max-width: 768px) {
+      .container { padding: 0 var(--sp-lg); }
+      .section-header { margin-bottom: var(--sp-2xl); }
+      .section-header p { font-size: 16px; line-height: 26px; }
+    }
+
+    /* --- App section phone image sizing + copy text --- */
+    @media (max-width: 768px) {
+      .app-section { padding: var(--sp-3xl) var(--sp-lg); }
+      .app-copy-h { font-size: 26px; }
+      .app-copy-bio { font-size: 15px; line-height: 25px; }
+      .app-badge img { height: 46px; }
+    }
+
+    /* --- Memberships / tiers: spacing on phones --- */
+    @media (max-width: 768px) {
+      .tier { padding: 20px 18px; }
+      .tier-price { font-size: 40px; }
+      .tier-name { font-size: 22px; }
+    }
+
+    /* --- Footer stacks cleanly --- */
+    @media (max-width: 640px) {
+      .footer-inner { flex-direction: column; align-items: center; text-align: center; gap: var(--sp-md); }
+      .footer-meta { flex-wrap: wrap; justify-content: center; gap: var(--sp-md); }
+    }
+
+    /* --- Final CTA --- */
+    @media (max-width: 768px) {
+      .cta-final p { font-size: 16px; line-height: 26px; }
+    }
+
+    /* --- Extra-small phones (iPhone SE, small Android): squeeze more --- */
+    @media (max-width: 400px) {
+      .nav-logo-img { height: 32px; }
+      .hero-content { padding: 48px var(--sp-md) 32px; }
+      .radar-num { font-size: clamp(48px, 16vw, 80px); }
+      .hero-reveal h1 { font-size: 28px; line-height: 32px; }
+      .hero-actions { gap: 10px; }
+      .hero-actions .btn { padding: 10px 14px; font-size: 11px; }
+    }
   </style>
 </head>
 <body>
@@ -2333,7 +2491,10 @@
       <a href="#top" class="nav-logo" aria-label="The Den x FCS - back to top">
         <img src="denfcs-logo.png" alt="The Den x FCS" class="nav-logo-img" />
       </a>
-      <div class="nav-links">
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span>
+      </button>
+      <div class="nav-links" id="nav-links">
         <a href="#featured">Featured</a>
         <a href="#alumni">Pros</a>
         <a href="#coaches">Coaches</a>
@@ -2347,6 +2508,27 @@
       </div>
     </div>
   </nav>
+  <script>
+    // Mobile nav toggle — added 2026-04-22 for mobile fixes.
+    (function(){
+      const btn = document.getElementById('nav-toggle');
+      const links = document.getElementById('nav-links');
+      if (!btn || !links) return;
+      btn.addEventListener('click', function(){
+        const open = links.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      });
+      // Close the menu after tapping a link.
+      links.querySelectorAll('a').forEach(function(a){
+        a.addEventListener('click', function(){
+          links.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          btn.setAttribute('aria-label', 'Open menu');
+        });
+      });
+    })();
+  </script>
 
   <section class="hero" id="top">
     <div class="hero-bg">
