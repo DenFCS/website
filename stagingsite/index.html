@@ -2388,14 +2388,26 @@
       .nav { position: sticky; }
     }
 
-    /* --- Hero: stack the split videos vertically on phones --- */
+    /* --- Hero: stack videos vertically with landscape aspect so the
+           frames don't feel squished next to the velocity numbers --- */
     @media (max-width: 768px) {
-      .hero { min-height: auto; }
-      .hero-bg { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      .hero { min-height: auto; display: block; }
+      /* Take hero-bg OUT of absolute positioning so it flows in front of
+         the content stack; videos get a real landscape aspect ratio. */
+      .hero-bg {
+        position: relative;
+        inset: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+      }
+      .hero-half { aspect-ratio: 16 / 9; }
       .hero-half-right { border-left: none; border-top: 1px solid rgba(201, 169, 97, 0.15); }
+      /* Vignette only over the videos, not the content */
+      .hero-vignette { display: none; }
       .hero-content {
-        padding: 56px var(--sp-lg) 40px;
-        min-height: 92vh;
+        padding: 40px var(--sp-lg) 40px;
+        min-height: 0;
+        background: var(--n-0);
       }
       .hero-frame-label { font-size: 9px; letter-spacing: 0.2em; }
       .hero-frame-label.tl, .hero-frame-label.tr { top: 10px; }
@@ -2417,21 +2429,25 @@
       .hero-actions .btn { padding: 12px 18px; font-size: 12px; }
     }
 
-    /* --- Alumni tabs: enable horizontal scroll on narrow screens
-           so names don't truncate awkwardly --- */
+    /* --- Alumni tabs: firm, smooth horizontal scroll on phones.
+           (removed scroll-snap — was causing wonky jumpy behavior) --- */
     @media (max-width: 768px) {
       .alumni-tabs {
+        flex-wrap: nowrap;
         overflow-x: auto;
-        scroll-snap-type: x mandatory;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        justify-content: flex-start;
       }
       .alumni-tabs::-webkit-scrollbar { display: none; }
       .alumni-tab {
-        flex: 0 0 auto;
-        min-width: 120px;
-        padding: 14px 12px;
-        scroll-snap-align: start;
+        flex: 0 0 130px;
+        padding: 14px 10px;
+        border-right: 1px solid var(--n-200);
       }
       .alumni-tab-avatar { width: 40px; height: 40px; }
       .alumni-tab-name { font-size: 10.5px; line-height: 1.2; text-align: center; }
@@ -2476,11 +2492,75 @@
     /* --- Extra-small phones (iPhone SE, small Android): squeeze more --- */
     @media (max-width: 400px) {
       .nav-logo-img { height: 32px; }
-      .hero-content { padding: 48px var(--sp-md) 32px; }
+      .hero-content { padding: 32px var(--sp-md) 32px; }
       .radar-num { font-size: clamp(48px, 16vw, 80px); }
       .hero-reveal h1 { font-size: 28px; line-height: 32px; }
       .hero-actions { gap: 10px; }
       .hero-actions .btn { padding: 10px 14px; font-size: 11px; }
+    }
+
+    /* --- Pillars (Process/TDS grid): horizontal scroll carousel on phones,
+           replacing the stacked grid --- */
+    .loc-chip-directions { display: none; }   /* hidden by default, shown on mobile below */
+
+    @media (max-width: 768px) {
+      .tds-grid {
+        display: flex;
+        grid-template-columns: none;    /* defeat desktop grid */
+        flex-wrap: nowrap;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        overscroll-behavior-x: contain;
+        touch-action: pan-x;
+        padding: 0 var(--sp-lg) 8px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .tds-grid::-webkit-scrollbar { display: none; }
+      .tds-card {
+        flex: 0 0 78vw;
+        max-width: 320px;
+        min-height: 280px;
+        scroll-snap-align: center;
+      }
+    }
+
+    /* --- Locations: each chip gets a native-maps "Get Directions"
+           button below it on mobile --- */
+    .loc-chip-group { display: contents; }
+    @media (max-width: 768px) {
+      .loc-chips {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .loc-chip-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .loc-chip { padding: 14px 16px; }
+      .loc-chip-directions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 16px;
+        background: var(--gold-400);
+        color: var(--n-0);
+        font-family: var(--f-util);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-decoration: none;
+        border-radius: 4px;
+        border: 1px solid var(--gold-400);
+      }
+      .loc-chip-directions:active { background: var(--gold-300); }
+      .loc-chip-directions svg { width: 14px; height: 14px; flex-shrink: 0; }
     }
   </style>
 </head>
@@ -3193,30 +3273,48 @@
     </div>
 
     <div class="loc-chips">
-      <button class="loc-chip" data-loc="1">
-        <div class="chip-head">
-          <div class="chip-dot"></div>
-          <div class="chip-tag">Location 01</div>
-        </div>
-        <div class="chip-name">Kingwood</div>
-        <div class="chip-region">Porter, TX &middot; Northeast</div>
-      </button>
-      <button class="loc-chip" data-loc="2">
-        <div class="chip-head">
-          <div class="chip-dot"></div>
-          <div class="chip-tag">Location 02</div>
-        </div>
-        <div class="chip-name">Spring</div>
-        <div class="chip-region">Spring, TX &middot; North</div>
-      </button>
-      <button class="loc-chip" data-loc="3">
-        <div class="chip-head">
-          <div class="chip-dot"></div>
-          <div class="chip-tag">Location 03</div>
-        </div>
-        <div class="chip-name">Baseball USA</div>
-        <div class="chip-region">West Houston, TX</div>
-      </button>
+      <div class="loc-chip-group">
+        <button class="loc-chip" data-loc="1">
+          <div class="chip-head">
+            <div class="chip-dot"></div>
+            <div class="chip-tag">Location 01</div>
+          </div>
+          <div class="chip-name">Kingwood</div>
+          <div class="chip-region">Porter, TX &middot; Northeast</div>
+        </button>
+        <a class="loc-chip-directions" href="https://www.google.com/maps/dir/?api=1&destination=20134+Olds+Dr+Porter+TX+77365" target="_blank" rel="noopener noreferrer" aria-label="Get directions to Kingwood">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Get Directions
+        </a>
+      </div>
+      <div class="loc-chip-group">
+        <button class="loc-chip" data-loc="2">
+          <div class="chip-head">
+            <div class="chip-dot"></div>
+            <div class="chip-tag">Location 02</div>
+          </div>
+          <div class="chip-name">Spring</div>
+          <div class="chip-region">Spring, TX &middot; North</div>
+        </button>
+        <a class="loc-chip-directions" href="https://www.google.com/maps/dir/?api=1&destination=27323+W+Hardy+Rd+403+Spring+TX+77373" target="_blank" rel="noopener noreferrer" aria-label="Get directions to Spring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Get Directions
+        </a>
+      </div>
+      <div class="loc-chip-group">
+        <button class="loc-chip" data-loc="3">
+          <div class="chip-head">
+            <div class="chip-dot"></div>
+            <div class="chip-tag">Location 03</div>
+          </div>
+          <div class="chip-name">Baseball USA</div>
+          <div class="chip-region">West Houston, TX</div>
+        </button>
+        <a class="loc-chip-directions" href="https://www.google.com/maps/dir/?api=1&destination=2626+W+Sam+Houston+Pkwy+N+Houston+TX+77043" target="_blank" rel="noopener noreferrer" aria-label="Get directions to Baseball USA">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Get Directions
+        </a>
+      </div>
     </div>
   </section>
 
