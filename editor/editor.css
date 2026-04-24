@@ -1,4 +1,4 @@
-/* /editor/editor.css */
+/* /editor/editor.css v=5 */
 :root {
   --gold:#C8A84E; --gold-light:#E0C872;
   --dark:#0D0D0D; --dark-2:#141414; --dark-3:#1A1A1A;
@@ -6,7 +6,6 @@
 }
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 html, body { height:100%; }
-/* `hidden` must win over display:flex/grid */
 [hidden] { display: none !important; }
 body {
   background: var(--dark); color: var(--text);
@@ -50,7 +49,7 @@ a { color: var(--gold); }
   grid-template-areas:
     "toolbar toolbar"
     "sidebar canvas";
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 300px 1fr;
   grid-template-rows: 52px 1fr;
   height: 100vh;
 }
@@ -67,29 +66,81 @@ a { color: var(--gold); }
   padding: 8px 14px; border-radius: 3px; border: 1px solid transparent;
   font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
   text-transform: uppercase; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
 }
 .btn-primary { background: var(--gold); color: var(--dark); }
 .btn-primary:hover { background: var(--gold-light); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
 .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-sm { padding: 5px 10px; font-size: 10px; }
 
+/* ---------- Sidebar ---------- */
 .sidebar {
   grid-area: sidebar;
   background: var(--dark-2); border-right: 1px solid var(--border);
-  padding: 20px 16px; overflow-y: auto;
+  display: flex; flex-direction: column;
+  overflow: hidden;
 }
-.sb-block { margin-bottom: 28px; }
+.sb-head { padding: 16px 16px 8px; }
 .sb-heading {
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 10px;
+  color: var(--gold); margin-bottom: 4px;
 }
-.sb-tips { list-style: none; padding: 0; }
-.sb-tips li { padding: 6px 0; color: #d0cdc6; font-size: 13px; line-height: 1.5; border-bottom: 1px dashed var(--border); }
-.sb-tips li:last-child { border: none; }
-.sb-count { font-family: "Oswald", sans-serif; font-size: 40px; color: var(--text); line-height: 1; }
+.sb-sub { font-size: 11px; color: var(--muted); }
+.sb-footer {
+  margin-top: auto; padding: 16px; border-top: 1px solid var(--border);
+  background: var(--dark-3);
+}
+.sb-count { font-family: "Oswald", sans-serif; font-size: 36px; color: var(--text); line-height: 1; }
 .sb-count.dirty { color: var(--gold); }
-.sb-note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.sb-note { color: var(--muted); font-size: 11px; margin-top: 6px; line-height: 1.5; }
+
+/* Sections list */
+.sections-list {
+  list-style: none;
+  padding: 4px 8px 8px;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+.section-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px; margin-bottom: 4px;
+  border: 1px solid transparent; border-radius: 3px;
+  background: var(--dark-3);
+  cursor: pointer;
+  user-select: none;
+}
+.section-row:hover { border-color: var(--border); }
+.section-row.drag-over { border-color: var(--gold); background: rgba(200,168,78,0.08); }
+.section-row.dragging { opacity: 0.5; }
+.section-row-drag {
+  color: var(--muted); font-size: 14px; cursor: grab;
+  padding: 0 2px;
+}
+.section-row-label {
+  flex: 1; min-width: 0;
+  font-size: 13px; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.section-row-tag {
+  font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--muted);
+}
+.section-row-actions {
+  display: flex; gap: 2px; opacity: 0.5;
+  transition: opacity 0.15s;
+}
+.section-row:hover .section-row-actions { opacity: 1; }
+.sr-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--text);
+  width: 22px; height: 22px; border-radius: 2px;
+  font-size: 12px; cursor: pointer; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.sr-btn:hover { border-color: var(--gold); color: var(--gold); }
+.sr-btn.danger:hover { border-color: #e56; color: #e56; }
 
 .canvas {
   grid-area: canvas; background: #000; position: relative;
@@ -98,25 +149,59 @@ a { color: var(--gold); }
   width: 100%; height: 100%; border: 0; display: block; background: #fff;
 }
 
-/* ---------- Inside the iframe (injected) ---------- */
-/* styles live as text in editor.js (INJECTED_CSS) so they land in the iframe doc */
-
 /* ---------- Modal ---------- */
 .modal {
   position: fixed; inset: 0; z-index: 100;
   background: rgba(0,0,0,0.78); display: flex; align-items: center; justify-content: center;
+  padding: 24px;
 }
-.modal[hidden] { display: none; }
 .modal-card {
   background: var(--dark-2); border: 1px solid var(--gold);
   border-radius: 4px; padding: 28px 32px; max-width: 560px; width: 92vw;
+  max-height: 90vh; overflow-y: auto;
 }
+.modal-wide { max-width: 900px; }
 .modal-title { font-size: 18px; letter-spacing: 1px; margin-bottom: 8px; }
 .modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
 .modal-p { color: #ccc; margin-bottom: 12px; }
 .modal-ol { margin: 0 0 16px 20px; color: #ccc; font-size: 13px; }
 .modal-ol li { margin-bottom: 4px; }
 .modal-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* Link editor */
+.link-field { display: block; margin-bottom: 8px; }
+.link-field span {
+  display: block; font-size: 11px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+}
+.link-examples {
+  background: #0a0a0a; padding: 10px 12px; border-radius: 3px;
+  font-size: 12px; color: #bbb; line-height: 1.6;
+  margin-top: 8px;
+}
+
+/* Template picker */
+.tpl-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.tpl-card {
+  background: var(--dark-3); border: 1px solid var(--border);
+  border-radius: 4px; padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.tpl-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.tpl-thumb {
+  background: #0a0a0a; height: 100px; margin-bottom: 10px;
+  border-radius: 3px; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  border: 1px dashed var(--border);
+  flex-direction: column; gap: 6px;
+}
+.tpl-thumb svg { color: var(--gold); }
+.tpl-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.tpl-desc { font-size: 11px; color: var(--muted); }
 
 /* ---------- Crop stage ---------- */
 .crop-stage { display:flex; justify-content:center; margin: 8px 0 16px; }

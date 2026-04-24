@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DenFCS — Site Editor</title>
-  <link rel="stylesheet" href="/editor/editor.css?v=4" />
+  <link rel="stylesheet" href="/editor/editor.css?v=5" />
 </head>
 <body>
 
@@ -27,6 +27,7 @@
         <span class="toolbar-status" id="status">idle</span>
       </div>
       <div class="toolbar-right">
+        <button id="btn-add-section" class="btn btn-ghost">+ Add Section</button>
         <button id="btn-reset" class="btn btn-ghost" title="Discard local edits and reload from staging">Discard</button>
         <button id="btn-preview" class="btn btn-ghost">Preview</button>
         <button id="btn-push" class="btn btn-primary">Push to Staging &rarr;</button>
@@ -34,20 +35,19 @@
     </header>
 
     <aside class="sidebar">
-      <div class="sb-block">
-        <div class="sb-heading">How to edit</div>
-        <ul class="sb-tips">
-          <li>Click any <b>text</b> to type directly.</li>
-          <li>Click any <b>image</b> to replace it.</li>
-          <li>If the new image has different dimensions, you'll get a reposition &amp; zoom dialog.</li>
-          <li>Hit <b>Push to Staging</b> when ready. Staging appears at <code>/stagingsite</code>.</li>
-          <li>From staging, use the top bar to <b>Deploy to Production</b>.</li>
-        </ul>
+      <div class="sb-head">
+        <div class="sb-heading">Sections</div>
+        <div class="sb-sub">Drag to reorder. Click to jump.</div>
       </div>
-      <div class="sb-block">
-        <div class="sb-heading">Unsaved changes</div>
+      <ol id="sections-list" class="sections-list"></ol>
+
+      <div class="sb-footer">
+        <div class="sb-heading">Changes</div>
         <div id="dirty-count" class="sb-count">0</div>
-        <div class="sb-note">Your edits live in this browser until you push.</div>
+        <div class="sb-note">
+          <b>How to edit</b><br/>
+          Click text to type · Click image to replace · Hover button → pencil to change link
+        </div>
       </div>
     </aside>
 
@@ -77,6 +77,37 @@
     </div>
   </div>
 
+  <!-- Add-section template picker modal -->
+  <div id="tpl-modal" class="modal" hidden>
+    <div class="modal-card modal-wide">
+      <div class="modal-title">Add a new section</div>
+      <div class="modal-sub">Pick a starting layout. Inserts at the bottom — reorder from the Sections panel after.</div>
+      <div class="tpl-grid" id="tpl-grid"></div>
+      <div class="modal-btns">
+        <button class="btn btn-ghost" id="tpl-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link editor popup -->
+  <div id="link-modal" class="modal" hidden>
+    <div class="modal-card">
+      <div class="modal-title">Edit link</div>
+      <div class="modal-sub">Where should this button take people?</div>
+      <label class="link-field">
+        <span>URL or address</span>
+        <input type="text" id="link-url" placeholder="https://example.com  or  mailto:you@denfcs.com  or  #anchor" />
+      </label>
+      <div class="link-examples">
+        <b>Examples:</b> <code>https://...</code> · <code>mailto:team@lionsdenhtx.com</code> · <code>#coaches</code> (jump to section) · <code>/summerprogram/</code> (another page on the site)
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-ghost" id="link-cancel">Cancel</button>
+        <button class="btn btn-primary" id="link-save">Save link</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PAT prompt modal -->
   <div id="pat-modal" class="modal" hidden>
     <div class="modal-card">
@@ -99,6 +130,6 @@
   <!-- Toast -->
   <div id="toast" class="toast" hidden></div>
 
-  <script src="/editor/editor.js?v=3"></script>
+  <script src="/editor/editor.js?v=5"></script>
 </body>
 </html>
