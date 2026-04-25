@@ -165,6 +165,30 @@
     return out;
   }
 
+  // Fetch a file's CURRENT content via the GitHub API (not the CDN).
+  // raw.githubusercontent.com caches aggressively for several minutes
+  // after a commit — using it to deploy means we'd often write the OLD
+  // content back to prod even though staging just changed.
+  async function getStagingContent(f) {
+    const pat = await getPat();
+    const res = await fetch(
+      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${f.stagingPath}?ref=${BRANCH}`,
+      {
+        cache: 'no-store',
+        headers: {
+          'Authorization': `token ${pat}`,
+          // Raw media type → returns the file content directly, regardless of size.
+          'Accept': 'application/vnd.github.raw',
+        },
+      }
+    );
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(`Couldn't read ${f.stagingPath}: ${res.status} ${t.slice(0, 120)}`);
+    }
+    return res;
+  }
+
   async function runDeploy(bg) {
     const btn = document.getElementById('sb-confirm');
     btn.disabled = true;
@@ -176,8 +200,8 @@
 
       for (const f of files) {
         log(`→ ${f.prodPath}`);
-        // Fetch staging file content
-        const blobRes = await fetch(f.downloadUrl, { cache: 'no-store' });
+        // Fetch staging file content via GitHub API (always fresh)
+        const blobRes = await getStagingContent(f);
         const isHtml = f.name.toLowerCase().endsWith('.html');
         let body;
         if (isHtml) {
