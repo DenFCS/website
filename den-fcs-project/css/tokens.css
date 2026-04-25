@@ -1,0 +1,169 @@
+/* =========================================================
+   DEN × FCS — Design Tokens
+   ---------------------------------------------------------
+   The brand system. Every color, font, and spacing value
+   used across the site is defined here. Change a value
+   here and it updates everywhere.
+
+   DO NOT hardcode colors or font names in other CSS files.
+   Always reference these variables.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   FONTS — loaded from ./fonts/
+   --------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/Orbitron-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Orbitron';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/Orbitron-ExtraBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/Newsreader-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/Newsreader-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/Newsreader-SemiBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fonts/GolosText-Variable.ttf') format('truetype-variations');
+}
+@font-face {
+  font-family: 'Cal Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/CalSans-Regular.ttf') format('truetype');
+}
+
+/* ---------------------------------------------------------
+   BRAND TOKENS
+   --------------------------------------------------------- */
+
+:root {
+
+  /* ---- Core brand colors ---- */
+  --color-white:  #FFFFFF;
+  --color-black:  #0A0A0A;
+  --color-gold:   #C9A961;
+  --color-tan:    #D4B896;
+  --color-brown:  #5C4328;
+
+  /* ---- Neutral scale (black to white) ---- */
+  --neutral-0:    #000000;
+  --neutral-50:   #0A0A0A;
+  --neutral-100:  #141414;
+  --neutral-200:  #1E1E1E;
+  --neutral-300:  #2A2A2A;
+  --neutral-400:  #3A3A3A;
+  --neutral-500:  #555555;
+  --neutral-600:  #7A7A7A;
+  --neutral-700:  #A3A3A3;
+  --neutral-800:  #C9C9C9;
+  --neutral-900:  #F0F0F0;
+  --neutral-1000: #FFFFFF;
+
+  /* ---- Gold scale (primary brand) ---- */
+  --gold-50:  #FAF5E8;
+  --gold-100: #F0E4C2;
+  --gold-200: #E5D29A;
+  --gold-300: #D9BF72;
+  --gold-400: #C9A961;  /* ★ base brand gold */
+  --gold-500: #B69446;
+  --gold-600: #927434;
+  --gold-700: #6E5727;
+  --gold-800: #4A3A1A;
+  --gold-900: #2A210F;
+
+  /* ---- Tan scale (secondary warm) ---- */
+  --tan-50:   #F9F2E6;
+  --tan-100:  #EFE2C9;
+  --tan-200:  #E3CFAB;
+  --tan-300:  #D4B896;  /* ★ base tan */
+  --tan-400:  #C2A179;
+  --tan-500:  #A6855D;
+  --tan-600:  #806544;
+  --tan-700:  #5A4830;
+  --tan-800:  #3D301F;
+
+  /* ---- Brown scale (grounding tone) ---- */
+  --brown-50:   #EDE4D7;
+  --brown-100:  #D4BFA0;
+  --brown-200:  #B59A73;
+  --brown-300:  #8C7450;
+  --brown-400:  #5C4328;  /* ★ base brown */
+  --brown-500:  #4A351F;
+  --brown-600:  #382816;
+  --brown-700:  #261B0E;
+  --brown-800:  #140E07;
+
+  /* ---- Semantic tokens (use these in components) ---- */
+  --bg-primary:     var(--neutral-50);
+  --bg-secondary:   var(--neutral-100);
+  --bg-tertiary:    var(--neutral-200);
+  --bg-inverse:     var(--neutral-1000);
+
+  --text-primary:   var(--neutral-1000);
+  --text-secondary: var(--neutral-800);
+  --text-muted:     var(--neutral-700);
+  --text-inverse:   var(--neutral-50);
+
+  --accent:         var(--gold-400);
+  --accent-hover:   var(--gold-300);
+  --accent-dim:     var(--gold-700);
+
+  --border-default: var(--neutral-300);
+  --border-subtle:  var(--neutral-200);
+
+  /* ---- Typography ---- */
+  --font-display:  'Orbitron', system-ui, sans-serif;
+  --font-display-alt: 'Cal Sans', system-ui, sans-serif;
+  --font-body:     'Newsreader', Georgia, serif;
+  --font-utility:  'Golos Text', system-ui, sans-serif;
+
+  /* ---- Spacing scale (8px base) ---- */
+  --space-xs:   4px;
+  --space-sm:   8px;
+  --space-md:   16px;
+  --space-lg:   24px;
+  --space-xl:   32px;
+  --space-2xl:  48px;
+  --space-3xl:  64px;
+  --space-4xl:  96px;
+
+  /* ---- Layout ---- */
+  --content-max-width: 1200px;
+  --content-padding-desktop: 48px;
+  --content-padding-mobile: 24px;
+
+  /* ---- Motion ---- */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+}

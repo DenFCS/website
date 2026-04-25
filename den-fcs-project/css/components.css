@@ -1,0 +1,265 @@
+/* =========================================================
+   DEN × FCS — Components
+   ---------------------------------------------------------
+   Reusable UI pieces: nav, footer, buttons, cards, badges.
+   Depends on: tokens.css, base.css
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   NAVIGATION
+   --------------------------------------------------------- */
+
+.site-nav {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-default);
+  padding: var(--space-md) 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.site-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding-desktop);
+}
+.site-nav-logo img {
+  height: 40px;
+  width: auto;
+}
+.site-nav-links {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: center;
+}
+.site-nav-links a {
+  font-family: var(--font-utility);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: var(--space-sm) 0;
+  border-bottom: 2px solid transparent;
+}
+.site-nav-links a:hover {
+  color: var(--accent);
+}
+.site-nav-links a.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ---------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------- */
+
+.site-footer {
+  background: var(--neutral-0);
+  color: var(--text-secondary);
+  padding: var(--space-4xl) 0 var(--space-xl);
+  margin-top: var(--space-4xl);
+  border-top: 2px solid var(--accent-dim);
+}
+.site-footer-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--content-padding-desktop);
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: var(--space-2xl);
+}
+.site-footer-brand img {
+  height: 56px;
+  width: auto;
+  margin-bottom: var(--space-md);
+}
+.site-footer-brand p {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 320px;
+}
+.site-footer-col h6 {
+  color: var(--accent);
+  margin-bottom: var(--space-md);
+}
+.site-footer-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.site-footer-col a {
+  font-family: var(--font-utility);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.site-footer-col a:hover {
+  color: var(--accent);
+}
+.site-footer-bottom {
+  max-width: var(--content-max-width);
+  margin: var(--space-2xl) auto 0;
+  padding: var(--space-lg) var(--content-padding-desktop) 0;
+  border-top: 1px solid var(--neutral-200);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-utility);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ---------------------------------------------------------
+   BUTTONS
+   --------------------------------------------------------- */
+
+.btn {
+  display: inline-block;
+  font-family: var(--font-utility);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-align: center;
+  line-height: 1;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--neutral-50);
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.btn-secondary:hover {
+  background: var(--accent);
+  color: var(--neutral-50);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--neutral-500);
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------------------------------------------------------
+   BADGES
+   --------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-utility);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: var(--neutral-50);
+  padding: 4px 10px;
+}
+.badge-outline {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 5px 12px;
+}
+
+/* ---------------------------------------------------------
+   CARDS
+   --------------------------------------------------------- */
+
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  padding: var(--space-xl);
+}
+.card-featured {
+  border-color: var(--accent);
+  border-width: 2px;
+  position: relative;
+}
+.card-featured .badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ---------------------------------------------------------
+   SECTIONS
+   --------------------------------------------------------- */
+
+.section {
+  padding: var(--space-4xl) 0;
+}
+.section-tight {
+  padding: var(--space-2xl) 0;
+}
+.section-dark {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+.section-light {
+  background: var(--bg-inverse);
+  color: var(--text-inverse);
+}
+.section-title-block {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+.section-title-block .eyebrow {
+  margin-bottom: var(--space-md);
+  display: block;
+}
+.section-title-block h2 {
+  margin-bottom: var(--space-md);
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .site-nav-links {
+    gap: var(--space-md);
+  }
+  .site-nav-links a {
+    font-size: 11px;
+  }
+  .site-footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+  .site-footer-bottom {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .section {
+    padding: var(--space-3xl) 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-footer-inner {
+    grid-template-columns: 1fr;
+  }
+  .site-nav-inner {
+    flex-wrap: wrap;
+  }
+}

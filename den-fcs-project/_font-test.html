@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Font &amp; Style Test — DEN × FCS</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  /* Override the dark default body for this test page — docs should be light. */
+  body {
+    background: var(--neutral-900);
+    color: var(--neutral-100);
+  }
+
+  .test-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 48px 96px;
+  }
+
+  .test-header {
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+    border-bottom: 2px solid var(--gold-400);
+  }
+  .test-header h1 {
+    color: var(--neutral-50);
+    font-size: 44px;
+    margin-bottom: 8px;
+  }
+  .test-header p {
+    color: var(--neutral-500);
+    font-size: 14px;
+  }
+
+  .test-block {
+    background: var(--neutral-1000);
+    border: 1px solid #E5E5E5;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .test-block-dark {
+    background: var(--neutral-50);
+    color: var(--neutral-1000);
+    border: none;
+  }
+
+  .test-label {
+    display: block;
+    font-family: var(--font-utility);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-600);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E5E5E5;
+  }
+  .test-block-dark .test-label {
+    color: var(--gold-300);
+    border-bottom-color: var(--neutral-300);
+  }
+
+  .test-block h1, .test-block h2, .test-block h3 { color: var(--neutral-50); margin: 0; }
+  .test-block-dark h1, .test-block-dark h2, .test-block-dark h3 { color: var(--neutral-1000); }
+
+  .test-block p { margin: 0; color: var(--neutral-200); }
+  .test-block-dark p { color: var(--neutral-800); }
+
+  .logo-display {
+    background: var(--neutral-50);
+    padding: 48px;
+    display: flex;
+    gap: 64px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .logo-display.light {
+    background: var(--neutral-1000);
+    border: 1px solid #E5E5E5;
+  }
+  .logo-display img.circle { height: 180px; }
+  .logo-display img.horizontal { height: 120px; }
+
+  .swatch-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .swatch-row .sw {
+    display: flex;
+    flex-direction: column;
+  }
+  .swatch-row .sw-color {
+    aspect-ratio: 2 / 1;
+    border: 1px solid #E5E5E5;
+  }
+  .swatch-row .sw-meta {
+    font-family: var(--font-utility);
+    font-size: 11px;
+    color: var(--neutral-500);
+    padding-top: 6px;
+    letter-spacing: 0.05em;
+  }
+  .swatch-row .sw-meta strong {
+    color: var(--neutral-100);
+    font-weight: 600;
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .button-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .checklist {
+    background: var(--gold-50);
+    border-left: 3px solid var(--gold-400);
+    padding: 24px 32px;
+    margin-top: 48px;
+  }
+  .checklist h3 {
+    color: var(--neutral-50);
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .checklist ul {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--neutral-200);
+    line-height: 1.8;
+  }
+  .checklist li {
+    list-style: disc;
+    margin-left: 20px;
+  }
+  .checklist code {
+    font-family: ui-monospace, monospace;
+    background: rgba(0,0,0,0.06);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="test-page">
+
+  <header class="test-header">
+    <h1>Font &amp; Style Test</h1>
+    <p>Open in a browser. If everything below looks right, the project is wired up correctly. Delete this file before deploying.</p>
+  </header>
+
+  <!-- HEADINGS -->
+  <div class="test-block">
+    <span class="test-label">Orbitron ExtraBold 800 — Hero / XXL</span>
+    <h1>Details Equal Numbers</h1>
+  </div>
+
+  <div class="test-block">
+    <span class="test-label">Orbitron ExtraBold 800 — Heading XL</span>
+    <h2>Three Facilities. Full Access.</h2>
+  </div>
+
+  <div class="test-block">
+    <span class="test-label">Orbitron Bold 700 — Heading L</span>
+    <h3>A Targeted Development System</h3>
+  </div>
+
+  <!-- BODY COPY -->
+  <div class="test-block">
+    <span class="test-label">Newsreader Light 300 — Body (default)</span>
+    <p style="font-size: 18px; line-height: 1.6;">This isn't a lesson package. It's a targeted development system built around one athlete. We learn the player. We understand what they need. And we build a summer around making them better — stronger, faster, more competitive, more prepared.</p>
+  </div>
+
+  <div class="test-block">
+    <span class="test-label">Newsreader — weight comparison</span>
+    <p style="font-weight: 300; margin-bottom: 12px;"><strong style="font-weight: 600;">Light 300 (default):</strong> Programmed strength and conditioning at every location — speed, agility, power.</p>
+    <p style="font-weight: 400; margin-bottom: 12px;"><strong style="font-weight: 600;">Regular 400 (emphasis):</strong> Programmed strength and conditioning at every location — speed, agility, power.</p>
+    <p style="font-weight: 600;"><strong>SemiBold 600 (heavy emphasis):</strong> Programmed strength and conditioning at every location — speed, agility, power.</p>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="test-block">
+    <span class="test-label">Golos Text 600 — Buttons</span>
+    <div class="button-row">
+      <a href="#" class="btn btn-primary">Enroll Now</a>
+      <a href="#" class="btn btn-secondary">Learn More</a>
+      <a href="#" class="btn btn-ghost" style="color: var(--neutral-200); border-color: var(--neutral-500);">View Details</a>
+    </div>
+  </div>
+
+  <!-- LOGOS ON DARK -->
+  <div class="test-block test-block-dark">
+    <span class="test-label">Logos — on dark surface</span>
+    <div class="logo-display">
+      <img class="circle" src="images/logo-circle.png" alt="DEN × FCS circle">
+      <img class="horizontal" src="images/logo-horizontal.png" alt="DEN × FCS horizontal">
+    </div>
+  </div>
+
+  <!-- LOGOS ON LIGHT -->
+  <div class="test-block">
+    <span class="test-label">Logos — on light surface</span>
+    <div class="logo-display light">
+      <img class="circle" src="images/logo-circle.png" alt="DEN × FCS circle">
+      <img class="horizontal" src="images/logo-horizontal.png" alt="DEN × FCS horizontal">
+    </div>
+  </div>
+
+  <!-- COLORS -->
+  <div class="test-block">
+    <span class="test-label">Core brand palette</span>
+    <div class="swatch-row">
+      <div class="sw">
+        <div class="sw-color" style="background: var(--gold-400);"></div>
+        <div class="sw-meta"><strong>Gold 400</strong>#C9A961</div>
+      </div>
+      <div class="sw">
+        <div class="sw-color" style="background: var(--tan-300);"></div>
+        <div class="sw-meta"><strong>Tan 300</strong>#D4B896</div>
+      </div>
+      <div class="sw">
+        <div class="sw-color" style="background: var(--brown-400);"></div>
+        <div class="sw-meta"><strong>Brown 400</strong>#5C4328</div>
+      </div>
+      <div class="sw">
+        <div class="sw-color" style="background: var(--neutral-50);"></div>
+        <div class="sw-meta"><strong>Neutral 50</strong>#0A0A0A</div>
+      </div>
+      <div class="sw">
+        <div class="sw-color" style="background: var(--neutral-1000);"></div>
+        <div class="sw-meta"><strong>Neutral 1000</strong>#FFFFFF</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="checklist">
+    <h3>What to verify</h3>
+    <ul>
+      <li>Headings are in <strong>Orbitron</strong> (geometric, technical-looking) — not a default sans-serif</li>
+      <li>Body copy is in <strong>Newsreader</strong> (serif with visible serifs on letters) — not Times or Georgia</li>
+      <li>Button labels are in <strong>Golos Text</strong> (clean sans-serif) with wide letter-spacing</li>
+      <li>Both logos render clearly on both the dark and light cards</li>
+      <li>Color swatches are visible and match the hex codes shown</li>
+      <li>If any of the above fails, check the browser's DevTools console (<code>F12</code>) for 404 errors on font or image paths</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
