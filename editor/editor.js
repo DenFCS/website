@@ -88,6 +88,26 @@
     });
     pagePicker.value = state.page.id;
   }
+  // When returning to the editor tab (e.g. after clicking Preview), some
+  // browsers drop the iframe's srcdoc contents, leaving a blank canvas.
+  // Detect that and silently re-load the current page.
+  function reloadIfBlank() {
+    if (!state.frameReady) return;
+    try {
+      const b = state.iframeDoc && state.iframeDoc.body;
+      if (!b || b.children.length === 0) {
+        // Blank — reload (unless user had unsaved changes we might wipe)
+        if (state.dirty) { showToast('Canvas blanked. Your unsaved edits were lost — click Discard to reload.'); return; }
+        loadPageIntoFrame(state.page);
+      }
+    } catch (err) {
+      // iframe document detached → same remedy
+      if (!state.dirty) loadPageIntoFrame(state.page);
+    }
+  }
+  window.addEventListener('focus', reloadIfBlank);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) reloadIfBlank(); });
+
   pagePicker.addEventListener('change', async () => {
     const next = PAGES.find(p => p.id === pagePicker.value);
     if (!next || next.id === state.page.id) return;
@@ -128,6 +148,17 @@
         instrumentIframe();
         state.frameReady = true;
         renderSectionsList();
+        // Belt-and-suspenders: if site scripts in the iframe mutate the DOM
+        // after onload fires, re-render the sections list a couple more times.
+        setTimeout(() => renderSectionsList(), 400);
+        setTimeout(() => renderSectionsList(), 1200);
+        // Also watch for structural changes so the list stays in sync.
+        if (state.bodyObserver) state.bodyObserver.disconnect();
+        state.bodyObserver = new MutationObserver(() => {
+          clearTimeout(state.bodyObserverDebounce);
+          state.bodyObserverDebounce = setTimeout(renderSectionsList, 150);
+        });
+        state.bodyObserver.observe(state.iframeDoc.body, { childList: true });
         clearDirty();
         setStatus('ready (' + page.label + ')');
       };
