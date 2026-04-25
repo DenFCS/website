@@ -60,7 +60,10 @@
     populatePagePicker();
     loadPageIntoFrame(state.page);
   }
-  if (sessionStorage.getItem(AUTH_KEY) === '1') unlock();
+  // Defer the auto-unlock until the rest of this IIFE finishes initializing
+  // all the const declarations below (pagePicker, frame, statusEl, etc.).
+  // Otherwise unlock() hits a temporal-dead-zone ReferenceError on refresh.
+  if (sessionStorage.getItem(AUTH_KEY) === '1') setTimeout(unlock, 0);
 
   function tryUnlock() {
     const entered = (gateInput.value || '').trim();
