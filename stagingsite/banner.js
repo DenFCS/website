@@ -138,7 +138,31 @@
     return html
       .replace(/<!-- staging-base-start -->[\s\S]*?<!-- staging-base-end -->\s*/g, '')
       .replace(/<!-- staging-banner-start -->[\s\S]*?<!-- staging-banner-end -->\s*/g, '')
-      .replace(/Where the Den Trains \(Staging\)/g, 'Where the Best Train');
+      // Generic staging title suffix strip: " (Staging)" right before </title>
+      .replace(/\s*\(Staging\)(\s*<\/title>)/i, '$1')
+      // Home page specifically used "Where the Den Trains" for staging; restore.
+      .replace(/Where the Den Trains(\s*<\/title>)/i, 'Where the Best Train$1');
+  }
+
+  // Recursively collect all files under stagingsite/<subPath>, skipping banner.js.
+  async function listStagingRecursive(subPath) {
+    const contents = await gh(`/contents/stagingsite${subPath}?ref=${BRANCH}`);
+    const out = [];
+    for (const entry of contents) {
+      if (entry.type === 'dir') {
+        const kids = await listStagingRecursive(subPath + '/' + entry.name);
+        out.push(...kids);
+      } else if (entry.type === 'file') {
+        if (entry.name === 'banner.js') continue; // staging-only asset
+        out.push({
+          stagingPath: entry.path,                              // e.g. "stagingsite/summerprogram/index.html"
+          prodPath: entry.path.replace(/^stagingsite\/?/, ''),  // e.g. "summerprogram/index.html"
+          downloadUrl: entry.download_url,
+          name: entry.name,
+        });
+      }
+    }
+    return out;
   }
 
   async function runDeploy(bg) {
@@ -146,17 +170,16 @@
     btn.disabled = true;
     btn.textContent = 'Deploying…';
     try {
-      log('Listing staging files…');
-      const tree = await gh(`/contents/stagingsite?ref=${BRANCH}`);
-      const files = tree.filter(f => f.type === 'file' && f.name !== 'banner.js');
-
-      log(`Found ${files.length} file(s) in stagingsite.`);
+      log('Listing staging files (recursive)…');
+      const files = await listStagingRecursive('');
+      log(`Found ${files.length} file(s) to deploy.`);
 
       for (const f of files) {
-        log(`→ ${f.name}`);
-        // Get staging file content (blob) — use download_url for large files
-        const blobRes = await fetch(f.download_url, { cache: 'no-store' });
-        let body, isHtml = f.name.toLowerCase().endsWith('.html');
+        log(`→ ${f.prodPath}`);
+        // Fetch staging file content
+        const blobRes = await fetch(f.downloadUrl, { cache: 'no-store' });
+        const isHtml = f.name.toLowerCase().endsWith('.html');
+        let body;
         if (isHtml) {
           const text = await blobRes.text();
           body = cleanForProd(text);
@@ -165,23 +188,22 @@
           body = new Uint8Array(buf);
         }
 
-        // Get existing prod file sha (if any)
+        // Existing prod sha?
         let prodSha = null;
         try {
-          const existing = await gh(`/contents/${encodeURIComponent(f.name)}?ref=${BRANCH}`);
+          const existing = await gh(`/contents/${f.prodPath}?ref=${BRANCH}`);
           prodSha = existing.sha;
-        } catch (e) { /* not present, will create */ }
+        } catch (e) { /* missing is ok */ }
 
-        // Base64 encode
         const b64 = isHtml
           ? btoa(unescape(encodeURIComponent(body)))
           : btoa(Array.from(body).map(b => String.fromCharCode(b)).join(''));
 
-        await gh(`/contents/${encodeURIComponent(f.name)}`, {
+        await gh(`/contents/${f.prodPath}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: `Deploy staging → production: ${f.name}`,
+            message: `Deploy staging → production: ${f.prodPath}`,
             content: b64,
             branch: BRANCH,
             ...(prodSha ? { sha: prodSha } : {}),

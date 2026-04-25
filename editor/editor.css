@@ -82,7 +82,19 @@ a { color: var(--gold); }
   display: flex; flex-direction: column;
   overflow: hidden;
 }
-.sb-head { padding: 16px 16px 8px; }
+.sb-head { padding: 12px 16px 6px; }
+.page-picker {
+  width: 100%; padding: 8px 10px; margin-top: 6px;
+  background: var(--dark-3); color: var(--text);
+  border: 1px solid var(--border); border-radius: 3px;
+  font-size: 13px; font-family: inherit; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23C8A84E' d='M0 0l5 6 5-6z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 28px;
+}
+.page-picker:focus { outline: none; border-color: var(--gold); }
 .sb-heading {
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
   color: var(--gold); margin-bottom: 4px;

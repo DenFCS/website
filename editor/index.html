@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DenFCS — Site Editor</title>
-  <link rel="stylesheet" href="/editor/editor.css?v=5" />
+  <link rel="stylesheet" href="/editor/editor.css?v=6" />
 </head>
 <body>
 
@@ -36,6 +36,10 @@
 
     <aside class="sidebar">
       <div class="sb-head">
+        <div class="sb-heading">Page</div>
+        <select id="page-picker" class="page-picker"></select>
+      </div>
+      <div class="sb-head" style="padding-top: 4px;">
         <div class="sb-heading">Sections</div>
         <div class="sb-sub">Drag to reorder. Click to jump.</div>
       </div>
@@ -92,18 +96,22 @@
   <!-- Link editor popup -->
   <div id="link-modal" class="modal" hidden>
     <div class="modal-card">
-      <div class="modal-title">Edit link</div>
-      <div class="modal-sub">Where should this button take people?</div>
+      <div class="modal-title">Edit button</div>
+      <div class="modal-sub">Change what this button says and where it goes.</div>
       <label class="link-field">
-        <span>URL or address</span>
+        <span>1. Button text (what people see)</span>
+        <input type="text" id="link-text" placeholder="e.g. Reach Out to Us" />
+      </label>
+      <label class="link-field">
+        <span>2. Destination URL (where it goes)</span>
         <input type="text" id="link-url" placeholder="https://example.com  or  mailto:you@denfcs.com  or  #anchor" />
       </label>
       <div class="link-examples">
-        <b>Examples:</b> <code>https://...</code> · <code>mailto:team@lionsdenhtx.com</code> · <code>#coaches</code> (jump to section) · <code>/summerprogram/</code> (another page on the site)
+        <b>URL examples:</b> <code>https://...</code> · <code>mailto:team@lionsdenhtx.com</code> · <code>#coaches</code> (jump to section) · <code>/summerprogram/</code> (another page on the site)
       </div>
       <div class="modal-btns">
         <button class="btn btn-ghost" id="link-cancel">Cancel</button>
-        <button class="btn btn-primary" id="link-save">Save link</button>
+        <button class="btn btn-primary" id="link-save">Save</button>
       </div>
     </div>
   </div>
@@ -130,6 +138,6 @@
   <!-- Toast -->
   <div id="toast" class="toast" hidden></div>
 
-  <script src="/editor/editor.js?v=5"></script>
+  <script src="/editor/editor.js?v=6"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
-/* /editor/editor.js v=5
+/* /editor/editor.js v=6
  * Visual editor for the DenFCS static site.
- * v5 adds: Sections panel (reorder/duplicate/delete), Add Section templates,
- * Edit Link popup, and full-DOM serialization on save.
+ * v6: multi-page support, button text+url editor (real pencil), mixed-content
+ * heading wrapping so every word is editable, full-DOM save.
  */
 (function () {
   'use strict';
@@ -10,18 +10,37 @@
   const REPO_OWNER = 'DenFCS';
   const REPO_NAME = 'website';
   const BRANCH = 'main';
-  const STAGING_HTML_PATH = 'stagingsite/index.html';
-  const STAGING_IMG_PATH_PREFIX = 'stagingsite/';
   const PAT_KEY = 'denfcs_editor_pat';
   const AUTH_KEY = 'denfcs_editor_unlocked';
 
+  /** Pages we know how to edit. Add more here as they're created. */
+  const PAGES = [
+    {
+      id: 'home',
+      label: 'Home (/)',
+      stagingSrc: '/stagingsite/index.html',
+      stagingPath: 'stagingsite/index.html',    // for GitHub API write
+      prodPath: 'index.html',                    // where it lives on prod
+      previewUrl: '/stagingsite/',
+    },
+    {
+      id: 'summerprogram',
+      label: 'Summer Program (/summerprogram/)',
+      stagingSrc: '/stagingsite/summerprogram/index.html',
+      stagingPath: 'stagingsite/summerprogram/index.html',
+      prodPath: 'summerprogram/index.html',
+      previewUrl: '/stagingsite/summerprogram/',
+    },
+  ];
+
   const state = {
-    pendingImages: new Map(),   // filename -> Uint8Array
-    newImageCounter: 0,          // for generated filenames on newly-added images
+    page: PAGES[0],
+    pendingImages: new Map(),   // filename -> { mime, bytes }
+    newImageCounter: 0,
     dirty: false,
     frameReady: false,
     iframeDoc: null,
-    originalHtml: '',            // raw staging HTML (with staging markers) as loaded
+    originalHtml: '',
   };
 
   const $ = s => document.querySelector(s);
@@ -38,7 +57,8 @@
   function unlock() {
     gate.hidden = true;
     app.hidden = false;
-    loadStagingIntoFrame();
+    populatePagePicker();
+    loadPageIntoFrame(state.page);
   }
   if (sessionStorage.getItem(AUTH_KEY) === '1') unlock();
 
@@ -46,31 +66,57 @@
     const entered = (gateInput.value || '').trim();
     if (entered === PASSWORD) {
       sessionStorage.setItem(AUTH_KEY, '1');
-      unlock();
-      return true;
+      unlock(); return true;
     }
     gateErr.textContent = 'Incorrect password';
-    gateInput.select();
-    return false;
+    gateInput.select(); return false;
   }
   gateForm.addEventListener('submit', e => { e.preventDefault(); tryUnlock(); });
   document.getElementById('gate-btn').addEventListener('click', e => { e.preventDefault(); tryUnlock(); });
   gateInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); tryUnlock(); } });
 
   // ============================================================
-  //  LOAD STAGING INTO IFRAME
+  //  PAGE PICKER
+  // ============================================================
+  const pagePicker = $('#page-picker');
+  function populatePagePicker() {
+    pagePicker.innerHTML = '';
+    PAGES.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id; opt.textContent = p.label;
+      pagePicker.appendChild(opt);
+    });
+    pagePicker.value = state.page.id;
+  }
+  pagePicker.addEventListener('change', async () => {
+    const next = PAGES.find(p => p.id === pagePicker.value);
+    if (!next || next.id === state.page.id) return;
+    if (state.dirty) {
+      if (!confirm('You have unsaved changes on ' + state.page.label + '. Switch pages and discard them?')) {
+        pagePicker.value = state.page.id;
+        return;
+      }
+    }
+    state.pendingImages.clear();
+    state.page = next;
+    await loadPageIntoFrame(next);
+  });
+
+  // ============================================================
+  //  LOAD PAGE
   // ============================================================
   const frame = $('#frame');
   const statusEl = $('#status');
 
-  async function loadStagingIntoFrame() {
-    setStatus('loading staging…');
+  async function loadPageIntoFrame(page) {
+    setStatus('loading ' + page.label + '…');
     try {
-      const res = await fetch('/stagingsite/index.html?ts=' + Date.now(), { cache: 'no-store' });
+      const res = await fetch(page.stagingSrc + '?ts=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error(`${res.status}: ${page.stagingSrc}`);
       let html = await res.text();
       state.originalHtml = html;
 
-      // Strip the staging banner (keep the base tag so images resolve)
+      // Strip staging banner for the editing iframe (we re-add on save)
       html = html.replace(/<!-- staging-banner-start -->[\s\S]*?<!-- staging-banner-end -->\s*/g, '');
       if (!/<base\s/i.test(html)) {
         html = html.replace(/<head[^>]*>/i, m => m + '\n  <base href="/">');
@@ -82,18 +128,17 @@
         instrumentIframe();
         state.frameReady = true;
         renderSectionsList();
-        setStatus('ready');
+        clearDirty();
+        setStatus('ready (' + page.label + ')');
       };
     } catch (err) {
       setStatus('load failed');
-      showToast('Failed to load staging: ' + err.message, true);
+      showToast('Failed to load ' + page.label + ': ' + err.message, true);
     }
   }
 
   // ============================================================
   //  IFRAME INSTRUMENTATION
-  //  (text-click-to-edit, image-click-to-replace, link editor,
-  //   section hover overlay)
   // ============================================================
 
   const INJECTED_CSS = `
@@ -103,30 +148,41 @@
     img[data-edit-img] { outline: 2px solid transparent; transition: outline-color .15s; cursor: pointer; }
     img[data-edit-img]:hover { outline-color: rgba(200,168,78,0.9); outline-offset: 2px; }
     .editor-image-pending { outline: 2px solid #C8A84E !important; outline-offset: 2px; }
-    a[data-edit-link]:hover::after {
-      content: '✎';
-      position: absolute;
-      top: 4px; right: 4px;
+
+    /* Floating pencil for link editor, injected into the iframe */
+    .editor-link-pencil {
+      position: absolute; z-index: 99999;
       background: #C8A84E; color: #0D0D0D;
-      font-size: 12px; line-height: 1;
-      padding: 3px 5px; border-radius: 2px;
-      pointer-events: none;
+      font: 700 11px/1 -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 5px 7px; border: none; border-radius: 2px;
+      cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      user-select: none;
     }
-    a[data-edit-link] { position: relative; }
-    section[data-section] { position: relative; }
-    section[data-section]:hover::before {
+    .editor-link-pencil:hover { background: #E0C872; }
+
+    /* Section label tag on hover */
+    section[data-section]:hover::before,
+    footer[data-section]:hover::before,
+    nav[data-section]:hover::before,
+    header[data-section]:hover::before {
       content: attr(data-section-label);
       position: absolute; top: 6px; left: 6px;
       background: rgba(13,13,13,0.9); color: #C8A84E;
       font: 600 10px/1 -apple-system, sans-serif; letter-spacing: 0.15em; text-transform: uppercase;
       padding: 4px 7px; border-radius: 2px;
-      z-index: 9999;
-      pointer-events: none;
+      z-index: 9999; pointer-events: none;
       outline: 1px solid #C8A84E;
     }
+    section[data-section], footer[data-section], nav[data-section], header[data-section] { position: relative; }
   `;
 
-  const TEXT_TAGS = new Set(['H1','H2','H3','H4','H5','H6','P','LI','SPAN','EM','STRONG','SMALL','BLOCKQUOTE','FIGCAPTION','DIV','BUTTON']);
+  // Elements that may contain raw text to make editable.
+  // NOTE: A is intentionally INCLUDED — we want button text editable.
+  const TEXT_TAGS = new Set([
+    'H1','H2','H3','H4','H5','H6','P','LI','SPAN','EM','STRONG','SMALL',
+    'BLOCKQUOTE','FIGCAPTION','DIV','BUTTON','A','LABEL','DT','DD','TD','TH','CAPTION'
+  ]);
 
   function instrumentIframe() {
     const doc = state.iframeDoc;
@@ -137,26 +193,69 @@
     style.textContent = INJECTED_CSS;
     doc.head.appendChild(style);
 
-    // Disable normal link navigation — we want clicks to either edit text
-    // (if inner) or open the link editor.
-    doc.addEventListener('click', handleDocClick, true);
+    // Wrap raw text children of mixed-content elements in spans so they
+    // can be edited word-group-by-word-group (e.g., the "What's" in
+    // <h2>What's <em>Running Now.</em></h2>).
+    wrapMixedContentTextNodes(doc.body);
 
-    // Re-scan DOM for editable pieces
+    // Text-click-to-edit
     instrumentTexts(doc.body);
+    // Image-click-to-replace
     instrumentImages(doc.body);
+    // Link pencil
     instrumentLinks(doc.body);
+    // Section labels
     instrumentSections(doc);
+
+    // Global click prevention for any href navigation from within the editor.
+    doc.addEventListener('click', blockNavigation, true);
+  }
+
+  function blockNavigation(e) {
+    // If user clicked a pencil we injected, let it handle its own click.
+    if (e.target.classList && e.target.classList.contains('editor-link-pencil')) return;
+    const a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+    // Prevent the iframe from navigating away.
+    e.preventDefault();
+  }
+
+  function wrapMixedContentTextNodes(root) {
+    // Walk every element; for each with >1 child nodes and a mix of
+    // real text nodes + element children, wrap each text node.
+    const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+    const toProcess = [];
+    let cur = walker.currentNode;
+    while (cur) {
+      if (cur.childNodes.length > 1 && cur.tagName && TEXT_TAGS.has(cur.tagName)) {
+        const hasEl = Array.from(cur.childNodes).some(n => n.nodeType === 1);
+        const hasText = Array.from(cur.childNodes).some(n => n.nodeType === 3 && n.nodeValue.trim());
+        if (hasEl && hasText) toProcess.push(cur);
+      }
+      cur = walker.nextNode();
+    }
+    toProcess.forEach(el => {
+      Array.from(el.childNodes).forEach(n => {
+        if (n.nodeType !== 3) return;
+        if (!n.nodeValue.trim()) return;      // whitespace only — skip
+        // Skip if already wrapped on a previous pass
+        if (n.parentNode.getAttribute && n.parentNode.getAttribute('data-text-wrap') === '1') return;
+        const span = root.ownerDocument.createElement('span');
+        span.setAttribute('data-text-wrap', '1');
+        span.textContent = n.nodeValue;
+        n.parentNode.replaceChild(span, n);
+      });
+    });
   }
 
   function instrumentTexts(root) {
-    root.querySelectorAll('body *').forEach(el => {
+    root.querySelectorAll('*').forEach(el => {
       if (!TEXT_TAGS.has(el.tagName)) return;
       if (el.hasAttribute('data-edit-text')) return;
       if (el.closest('script,style,noscript')) return;
       if (el.querySelector('*')) {
-        const hasDirectText = Array.from(el.childNodes).some(n => n.nodeType === 3 && n.nodeValue.trim().length);
-        if (!hasDirectText) return;
-        return;  // conservative: skip mixed-content
+        // Mixed-content: skip this element (children were wrapped to handle text)
+        return;
       }
       const txt = (el.textContent || '').trim();
       if (!txt) return;
@@ -179,9 +278,9 @@
   function instrumentLinks(root) {
     root.querySelectorAll('a').forEach(a => {
       if (a.hasAttribute('data-edit-link')) return;
-      // Only treat <a> as editable link if it's a button OR has no editable text child
       a.setAttribute('data-edit-link', '1');
-      a.addEventListener('click', onLinkClick, true);
+      a.addEventListener('mouseenter', showLinkPencil);
+      a.addEventListener('mouseleave', maybeHideLinkPencil);
     });
   }
 
@@ -193,35 +292,22 @@
       sec.setAttribute('data-section-label', deriveSectionLabel(sec));
     });
   }
-
   function deriveSectionLabel(sec) {
-    // Try h2, then h1, then eyebrow, then class name
     const h = sec.querySelector('h2, h1, h3');
     if (h && h.textContent.trim()) return h.textContent.trim().slice(0, 40);
     const e = sec.querySelector('.eyebrow');
     if (e && e.textContent.trim()) return e.textContent.trim().replace(/^—\s*|\s*—$/g, '').slice(0, 40);
-    // Fallback: first strong-ish class
     const c = (sec.className || '').split(/\s+/)[0];
     if (c) return c.replace(/[-_]/g, ' ');
     return sec.tagName.toLowerCase();
   }
 
-  function handleDocClick(e) {
-    // If click target is inside an <a> with data-edit-link, and the element
-    // itself is NOT a text-edit (they'd handle click themselves), open link editor.
-    const a = e.target.closest && e.target.closest('a[data-edit-link]');
-    if (!a) return;
-    // If the immediate target is an editable text, let text editing proceed.
-    if (e.target.closest('[data-edit-text]')) return;
-    // Otherwise: open link editor.
-    e.preventDefault(); e.stopPropagation();
-    openLinkEditor(a);
-  }
-
+  // -------- text edit callbacks --------
   function onTextClick(e) {
     const el = e.currentTarget;
     if (el.getAttribute('contenteditable') !== 'true') {
       el.setAttribute('contenteditable', 'true');
+      // Place caret at click position — contenteditable handles this natively
       el.focus();
     }
   }
@@ -229,44 +315,33 @@
     if (e.key === 'Enter' && !e.shiftKey && e.currentTarget.tagName !== 'P') {
       e.preventDefault(); e.currentTarget.blur();
     }
-    if (e.key === 'Escape') { e.currentTarget.blur(); }
+    if (e.key === 'Escape') e.currentTarget.blur();
   }
   function onTextBlur(e) {
     e.currentTarget.removeAttribute('contenteditable');
     markDirty();
   }
 
+  // -------- image edit callbacks --------
   function onImageClick(e) {
     e.preventDefault(); e.stopPropagation();
     const img = e.currentTarget;
     const input = document.createElement('input');
     input.type = 'file'; input.accept = 'image/*';
-    input.onchange = () => {
-      if (input.files[0]) handleImageFile(img, input.files[0]);
-    };
+    input.onchange = () => { if (input.files[0]) handleImageFile(img, input.files[0]); };
     input.click();
   }
-
   async function handleImageFile(imgEl, file) {
     const origWidth = imgEl.naturalWidth || 0;
     const origHeight = imgEl.naturalHeight || 0;
     const newImg = await fileToImage(file);
-
-    // No existing dimensions (e.g., brand new image from a template) → just drop it in
-    if (!origWidth || !origHeight) {
+    if (!origWidth || !origHeight ||
+        (newImg.naturalWidth === origWidth && newImg.naturalHeight === origHeight)) {
       const dataUrl = await fileToDataURL(file);
-      applyImageReplacement(imgEl, file, dataUrl);
-      return;
-    }
-
-    if (newImg.naturalWidth === origWidth && newImg.naturalHeight === origHeight) {
-      const dataUrl = await fileToDataURL(file);
-      applyImageReplacement(imgEl, file, dataUrl);
-      return;
+      applyImageReplacement(imgEl, file, dataUrl); return;
     }
     openCropModal({ imgEl, file, newImg, targetW: origWidth, targetH: origHeight });
   }
-
   function fileToImage(file) {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
@@ -280,8 +355,113 @@
     });
   }
 
+  function applyImageReplacement(imgEl, blobOrFile, dataUrl) {
+    const origSrc = imgEl.getAttribute('src') || '';
+    let fname = origSrc.split('/').pop().split('?')[0];
+    if (!fname || fname.startsWith('data:') || fname.length === 0) {
+      const ext = (blobOrFile.type || 'image/jpeg').split('/')[1] || 'jpg';
+      fname = `uploaded-${Date.now()}-${++state.newImageCounter}.${ext}`;
+      imgEl.setAttribute('src', fname);
+    }
+    blobToUint8(blobOrFile).then(bytes => {
+      state.pendingImages.set(fname, { mime: blobOrFile.type || 'image/jpeg', bytes });
+      imgEl.src = dataUrl;
+      imgEl.classList.add('editor-image-pending');
+      markDirty();
+    });
+  }
+  function blobToUint8(blob) { return blob.arrayBuffer().then(buf => new Uint8Array(buf)); }
+
   // ============================================================
-  //  CROP MODAL  (same as v4)
+  //  LINK PENCIL  (appears on hover of any <a>)
+  // ============================================================
+  let linkPencilEl = null;
+  let linkPencilTarget = null;
+  let linkPencilHideTimer = null;
+
+  function ensurePencil(doc) {
+    if (linkPencilEl && linkPencilEl.ownerDocument === doc) return linkPencilEl;
+    if (linkPencilEl && linkPencilEl.parentNode) linkPencilEl.parentNode.removeChild(linkPencilEl);
+    linkPencilEl = doc.createElement('button');
+    linkPencilEl.className = 'editor-link-pencil';
+    linkPencilEl.textContent = '✎ Edit link';
+    linkPencilEl.type = 'button';
+    doc.body.appendChild(linkPencilEl);
+    linkPencilEl.addEventListener('mouseenter', () => { if (linkPencilHideTimer) clearTimeout(linkPencilHideTimer); });
+    linkPencilEl.addEventListener('mouseleave', maybeHideLinkPencil);
+    linkPencilEl.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (linkPencilTarget) openLinkEditor(linkPencilTarget);
+    });
+    return linkPencilEl;
+  }
+
+  function showLinkPencil(e) {
+    const a = e.currentTarget;
+    const doc = a.ownerDocument;
+    ensurePencil(doc);
+    if (linkPencilHideTimer) { clearTimeout(linkPencilHideTimer); linkPencilHideTimer = null; }
+    linkPencilTarget = a;
+    const rect = a.getBoundingClientRect();
+    const win = doc.defaultView;
+    const scrollY = win.scrollY || 0;
+    const scrollX = win.scrollX || 0;
+    linkPencilEl.style.top = (rect.top + scrollY - 24) + 'px';
+    linkPencilEl.style.left = (rect.right + scrollX - 84) + 'px';
+    linkPencilEl.style.display = 'inline-block';
+  }
+  function maybeHideLinkPencil() {
+    if (linkPencilHideTimer) clearTimeout(linkPencilHideTimer);
+    linkPencilHideTimer = setTimeout(() => {
+      if (linkPencilEl) linkPencilEl.style.display = 'none';
+      linkPencilTarget = null;
+    }, 200);
+  }
+
+  // ============================================================
+  //  LINK EDITOR MODAL
+  // ============================================================
+  const linkModal = $('#link-modal');
+  const linkText = $('#link-text');
+  const linkUrl = $('#link-url');
+  let linkEditTarget = null;
+
+  function openLinkEditor(a) {
+    linkEditTarget = a;
+    // Text: use the anchor's visible text content. Could include wrapped
+    // spans; just use textContent for the dialog.
+    linkText.value = (a.textContent || '').trim();
+    linkUrl.value = a.getAttribute('href') || '';
+    linkModal.hidden = false;
+    // Hide the pencil while the modal is open
+    if (linkPencilEl) linkPencilEl.style.display = 'none';
+    linkUrl.focus(); linkUrl.select();
+  }
+  $('#link-cancel').addEventListener('click', () => { linkModal.hidden = true; linkEditTarget = null; });
+  $('#link-save').addEventListener('click', () => {
+    if (!linkEditTarget) return;
+    const newText = (linkText.value || '').trim();
+    const newUrl = (linkUrl.value || '').trim();
+    if (newText) {
+      // Replace text while preserving the element's structure:
+      // easiest — set textContent. This wipes any child spans, which is
+      // usually what the user wants for a button label.
+      linkEditTarget.textContent = newText;
+    }
+    linkEditTarget.setAttribute('href', newUrl);
+    if (newUrl.startsWith('#') || newUrl.startsWith('/')) linkEditTarget.removeAttribute('target');
+    linkModal.hidden = true;
+    linkEditTarget = null;
+    markDirty();
+    showToast('Button updated');
+  });
+  [linkText, linkUrl].forEach(el => el.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); $('#link-save').click(); }
+    if (e.key === 'Escape') { e.preventDefault(); $('#link-cancel').click(); }
+  }));
+
+  // ============================================================
+  //  CROP MODAL  (unchanged from v5)
   // ============================================================
   const cropModal = $('#crop-modal');
   const cropFrame = $('#crop-frame');
@@ -369,57 +549,8 @@
     });
   }
 
-  function applyImageReplacement(imgEl, blobOrFile, dataUrl) {
-    const origSrc = imgEl.getAttribute('src') || '';
-    let fname = origSrc.split('/').pop().split('?')[0];
-    if (!fname || fname.startsWith('data:') || fname.length === 0) {
-      // New image from a template — generate a filename
-      const ext = (blobOrFile.type || 'image/jpeg').split('/')[1] || 'jpg';
-      fname = `uploaded-${Date.now()}-${++state.newImageCounter}.${ext}`;
-      imgEl.setAttribute('src', fname);
-    }
-    blobToUint8(blobOrFile).then(bytes => {
-      state.pendingImages.set(fname, { mime: blobOrFile.type || 'image/jpeg', bytes });
-      imgEl.src = dataUrl;
-      imgEl.setAttribute('data-replaced-src', fname);
-      imgEl.classList.add('editor-image-pending');
-      markDirty();
-    });
-  }
-  function blobToUint8(blob) { return blob.arrayBuffer().then(buf => new Uint8Array(buf)); }
-
   // ============================================================
-  //  LINK EDITOR
-  // ============================================================
-  const linkModal = $('#link-modal');
-  const linkUrl = $('#link-url');
-  let linkEditTarget = null;
-
-  function openLinkEditor(a) {
-    linkEditTarget = a;
-    linkUrl.value = a.getAttribute('href') || '';
-    linkModal.hidden = false;
-    linkUrl.focus(); linkUrl.select();
-  }
-  $('#link-cancel').addEventListener('click', () => { linkModal.hidden = true; linkEditTarget = null; });
-  $('#link-save').addEventListener('click', () => {
-    if (!linkEditTarget) return;
-    const v = (linkUrl.value || '').trim();
-    linkEditTarget.setAttribute('href', v);
-    // If it's an internal anchor like #foo or a relative path, clear target=_blank
-    if (v.startsWith('#') || v.startsWith('/')) linkEditTarget.removeAttribute('target');
-    linkModal.hidden = true;
-    linkEditTarget = null;
-    markDirty();
-    showToast('Link saved');
-  });
-  linkUrl.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); $('#link-save').click(); }
-    if (e.key === 'Escape') { e.preventDefault(); $('#link-cancel').click(); }
-  });
-
-  // ============================================================
-  //  SECTIONS PANEL  (up / down / duplicate / delete / drag-reorder)
+  //  SECTIONS PANEL
   // ============================================================
   const sectionsListEl = $('#sections-list');
 
@@ -451,7 +582,7 @@
         sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
       row.querySelectorAll('.sr-btn').forEach(b => {
-        b.addEventListener('click', (ev) => {
+        b.addEventListener('click', ev => {
           ev.stopPropagation();
           const act = b.dataset.act;
           if (act === 'up') moveSection(sec, -1);
@@ -460,7 +591,6 @@
           else if (act === 'del') deleteSection(sec);
         });
       });
-      // Drag-reorder
       row.addEventListener('dragstart', e => {
         row.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
@@ -470,8 +600,7 @@
       row.addEventListener('dragover', e => { e.preventDefault(); row.classList.add('drag-over'); });
       row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
       row.addEventListener('drop', e => {
-        e.preventDefault();
-        row.classList.remove('drag-over');
+        e.preventDefault(); row.classList.remove('drag-over');
         const fromIdx = Number(e.dataTransfer.getData('text/plain'));
         const toIdx = Number(row.dataset.index);
         if (!isNaN(fromIdx) && fromIdx !== toIdx) reorderSections(fromIdx, toIdx);
@@ -499,158 +628,62 @@
   }
   function duplicateSection(sec) {
     const clone = sec.cloneNode(true);
-    // Strip element IDs inside the clone to avoid duplicates (keeps #anchors unique)
     clone.removeAttribute('id');
     clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
     sec.parentElement.insertBefore(clone, sec.nextSibling);
-    // Re-instrument the clone (its children need fresh edit handlers)
     instrumentTexts(clone);
     instrumentImages(clone);
     instrumentLinks(clone);
-    // Update section mapping
     instrumentSections(state.iframeDoc);
     markDirty(); renderSectionsList();
     clone.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   function deleteSection(sec) {
     const label = sec.getAttribute('data-section-label') || 'this section';
-    if (!confirm(`Delete "${label}"? You can always undo by clicking Discard (before pushing).`)) return;
+    if (!confirm(`Delete "${label}"?`)) return;
     sec.remove();
     markDirty(); renderSectionsList();
   }
 
   // ============================================================
-  //  ADD SECTION — template picker
+  //  ADD SECTION TEMPLATES
   // ============================================================
   const tplModal = $('#tpl-modal');
   const tplGrid = $('#tpl-grid');
 
   const TEMPLATES = [
     {
-      name: 'Image + Text',
-      desc: 'Photo on one side, headline + paragraph + button on the other.',
-      icon: 'image',
-      html: `
-<section class="section" style="padding: 80px 20px; background: #F5F2ED;">
-  <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
-    <div>
-      <img src="https://placehold.co/600x450/C8A84E/0D0D0D?text=Replace+me" alt="" style="width: 100%; border-radius: 6px;" />
-    </div>
-    <div>
-      <div class="eyebrow" style="color: #C8A84E; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px;">— New Section —</div>
-      <h2 style="font-size: 40px; line-height: 1.1; margin-bottom: 16px;">Your headline here.</h2>
-      <p style="font-size: 17px; line-height: 1.6; color: #555; margin-bottom: 24px;">Short description of what this section is about. Click to edit — you can change this text to anything you want.</p>
-      <a href="#" class="btn btn-primary" style="display: inline-flex; padding: 14px 24px; background: #C8A84E; color: #000; text-decoration: none; border-radius: 2px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;">Learn More</a>
-    </div>
-  </div>
-</section>`
+      name: 'Image + Text', desc: 'Photo on one side, headline + paragraph + button on the other.', icon: 'image',
+      html: `<section class="section" style="padding: 80px 20px; background: #F5F2ED;"><div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;"><div><img src="https://placehold.co/600x450/C8A84E/0D0D0D?text=Replace+me" alt="" style="width: 100%; border-radius: 6px;" /></div><div><div class="eyebrow" style="color: #C8A84E; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px;">— New Section —</div><h2 style="font-size: 40px; line-height: 1.1; margin-bottom: 16px;">Your headline here.</h2><p style="font-size: 17px; line-height: 1.6; color: #555; margin-bottom: 24px;">Short description of what this section is about. Click to edit.</p><a href="#" class="btn btn-primary" style="display: inline-flex; padding: 14px 24px; background: #C8A84E; color: #000; text-decoration: none; border-radius: 2px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;">Learn More</a></div></div></section>`
     },
     {
-      name: 'Big CTA Strip',
-      desc: 'Full-width call-to-action with headline and prominent button.',
-      icon: 'cta',
-      html: `
-<section class="section" style="padding: 100px 20px; background: #0D0D0D; color: #E8E4DC; text-align: center;">
-  <div style="max-width: 720px; margin: 0 auto;">
-    <h2 style="font-size: 44px; line-height: 1.1; margin-bottom: 16px;">Big call to action.</h2>
-    <p style="font-size: 18px; line-height: 1.6; color: #9A9588; margin-bottom: 28px;">One compelling sentence that gets visitors to click the button below.</p>
-    <a href="#" class="btn btn-primary" style="display: inline-flex; padding: 16px 32px; background: #C8A84E; color: #0D0D0D; text-decoration: none; border-radius: 2px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 14px;">Take Action</a>
-  </div>
-</section>`
+      name: 'Big CTA Strip', desc: 'Full-width call-to-action with headline and prominent button.', icon: 'cta',
+      html: `<section class="section" style="padding: 100px 20px; background: #0D0D0D; color: #E8E4DC; text-align: center;"><div style="max-width: 720px; margin: 0 auto;"><h2 style="font-size: 44px; line-height: 1.1; margin-bottom: 16px;">Big call to action.</h2><p style="font-size: 18px; line-height: 1.6; color: #9A9588; margin-bottom: 28px;">One compelling sentence that gets visitors to click the button below.</p><a href="#" class="btn btn-primary" style="display: inline-flex; padding: 16px 32px; background: #C8A84E; color: #0D0D0D; text-decoration: none; border-radius: 2px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 14px;">Take Action</a></div></section>`
     },
     {
-      name: 'Photo Banner',
-      desc: 'Full-width photo with text overlaid on top.',
-      icon: 'banner',
-      html: `
-<section class="section" style="position: relative; padding: 0; min-height: 420px; overflow: hidden;">
-  <img src="https://placehold.co/1600x500/0D0D0D/C8A84E?text=Replace+background+image" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
-  <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.55);"></div>
-  <div style="position: relative; padding: 120px 20px; text-align: center; color: #fff; z-index: 1;">
-    <h2 style="font-size: 48px; line-height: 1.1; margin-bottom: 12px;">Banner headline.</h2>
-    <p style="font-size: 18px; color: #E8E4DC; max-width: 600px; margin: 0 auto;">Supporting copy that sits over the photo.</p>
-  </div>
-</section>`
+      name: 'Photo Banner', desc: 'Full-width photo with text overlaid on top.', icon: 'banner',
+      html: `<section class="section" style="position: relative; padding: 0; min-height: 420px; overflow: hidden;"><img src="https://placehold.co/1600x500/0D0D0D/C8A84E?text=Replace+background+image" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" /><div style="position: absolute; inset: 0; background: rgba(0,0,0,0.55);"></div><div style="position: relative; padding: 120px 20px; text-align: center; color: #fff; z-index: 1;"><h2 style="font-size: 48px; line-height: 1.1; margin-bottom: 12px;">Banner headline.</h2><p style="font-size: 18px; color: #E8E4DC; max-width: 600px; margin: 0 auto;">Supporting copy that sits over the photo.</p></div></section>`
     },
     {
-      name: '3-Column Features',
-      desc: 'Three cards side-by-side: icon, heading, description.',
-      icon: 'grid',
-      html: `
-<section class="section" style="padding: 80px 20px; background: #FFFFFF;">
-  <div style="max-width: 1100px; margin: 0 auto; text-align: center; margin-bottom: 48px;">
-    <h2 style="font-size: 36px; margin-bottom: 12px;">Section heading.</h2>
-    <p style="font-size: 17px; color: #666;">Brief intro to these three features.</p>
-  </div>
-  <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
-    <div style="text-align: center; padding: 24px;">
-      <div style="font-size: 36px; color: #C8A84E; margin-bottom: 12px;">◆</div>
-      <h3 style="font-size: 20px; margin-bottom: 8px;">Feature one</h3>
-      <p style="color: #666; font-size: 15px;">Short benefit description.</p>
-    </div>
-    <div style="text-align: center; padding: 24px;">
-      <div style="font-size: 36px; color: #C8A84E; margin-bottom: 12px;">◆</div>
-      <h3 style="font-size: 20px; margin-bottom: 8px;">Feature two</h3>
-      <p style="color: #666; font-size: 15px;">Short benefit description.</p>
-    </div>
-    <div style="text-align: center; padding: 24px;">
-      <div style="font-size: 36px; color: #C8A84E; margin-bottom: 12px;">◆</div>
-      <h3 style="font-size: 20px; margin-bottom: 8px;">Feature three</h3>
-      <p style="color: #666; font-size: 15px;">Short benefit description.</p>
-    </div>
-  </div>
-</section>`
+      name: '3-Column Features', desc: 'Three cards side-by-side: icon, heading, description.', icon: 'grid',
+      html: `<section class="section" style="padding: 80px 20px; background: #FFFFFF;"><div style="max-width: 1100px; margin: 0 auto; text-align: center; margin-bottom: 48px;"><h2 style="font-size: 36px; margin-bottom: 12px;">Section heading.</h2><p style="font-size: 17px; color: #666;">Brief intro to these three features.</p></div><div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;"><div style="text-align: center; padding: 24px;"><div style="font-size: 36px; color: #C8A84E; margin-bottom: 12px;">◆</div><h3 style="font-size: 20px; margin-bottom: 8px;">Feature one</h3><p style="color: #666; font-size: 15px;">Short benefit description.</p></div><div style="text-align: center; padding: 24px;"><div style="font-size: 36px; color: #C8A84E; margin-bottom: 12px;">◆</div><h3 style="font-size: 20px; margin-bottom: 8px;">Feature two</h3><p style="color: #666; font-size: 15px;">Short benefit description.</p></div><div style="text-align: center; padding: 24px;"><div style="font-size: 36px; color: #C8A84E; margin-bottom: 12px;">◆</div><h3 style="font-size: 20px; margin-bottom: 8px;">Feature three</h3><p style="color: #666; font-size: 15px;">Short benefit description.</p></div></div></section>`
     },
     {
-      name: 'Video + Text Split',
-      desc: 'Video on one side, descriptive text on the other.',
-      icon: 'video',
-      html: `
-<section class="section" style="padding: 80px 20px; background: #0D0D0D; color: #E8E4DC;">
-  <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;">
-    <div style="aspect-ratio: 16/9; background: #000; border-radius: 6px; overflow: hidden;">
-      <img src="https://placehold.co/640x360/0D0D0D/C8A84E?text=Video+thumbnail" alt="Video thumbnail" style="width: 100%; height: 100%; object-fit: cover;" />
-    </div>
-    <div>
-      <div style="color: #C8A84E; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px;">— Watch —</div>
-      <h2 style="font-size: 36px; line-height: 1.1; margin-bottom: 14px;">See how we train.</h2>
-      <p style="font-size: 16px; line-height: 1.6; color: #9A9588; margin-bottom: 22px;">Short description of what viewers will see in the video.</p>
-      <a href="#" class="btn btn-primary" style="display: inline-flex; padding: 14px 24px; background: #C8A84E; color: #0D0D0D; text-decoration: none; border-radius: 2px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;">Watch Now</a>
-    </div>
-  </div>
-</section>`
+      name: 'Video + Text Split', desc: 'Video on one side, descriptive text on the other.', icon: 'video',
+      html: `<section class="section" style="padding: 80px 20px; background: #0D0D0D; color: #E8E4DC;"><div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;"><div style="aspect-ratio: 16/9; background: #000; border-radius: 6px; overflow: hidden;"><img src="https://placehold.co/640x360/0D0D0D/C8A84E?text=Video+thumbnail" alt="Video thumbnail" style="width: 100%; height: 100%; object-fit: cover;" /></div><div><div style="color: #C8A84E; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px;">— Watch —</div><h2 style="font-size: 36px; line-height: 1.1; margin-bottom: 14px;">See how we train.</h2><p style="font-size: 16px; line-height: 1.6; color: #9A9588; margin-bottom: 22px;">Short description of what viewers will see in the video.</p><a href="#" class="btn btn-primary" style="display: inline-flex; padding: 14px 24px; background: #C8A84E; color: #0D0D0D; text-decoration: none; border-radius: 2px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;">Watch Now</a></div></div></section>`
     },
     {
-      name: 'Testimonial',
-      desc: 'Single large pull-quote with name + attribution.',
-      icon: 'quote',
-      html: `
-<section class="section" style="padding: 100px 20px; background: #F5F2ED; text-align: center;">
-  <div style="max-width: 820px; margin: 0 auto;">
-    <div style="font-size: 72px; color: #C8A84E; line-height: 1; margin-bottom: 12px;">"</div>
-    <blockquote style="font-size: 26px; line-height: 1.45; font-style: italic; color: #0D0D0D; margin-bottom: 24px;">The single best training experience I've had. Every rep matters here.</blockquote>
-    <div style="font-size: 14px; color: #666;">
-      <strong style="color: #0D0D0D; display: block; margin-bottom: 2px;">First Last</strong>
-      Team · Role
-    </div>
-  </div>
-</section>`
+      name: 'Testimonial', desc: 'Single large pull-quote with name + attribution.', icon: 'quote',
+      html: `<section class="section" style="padding: 100px 20px; background: #F5F2ED; text-align: center;"><div style="max-width: 820px; margin: 0 auto;"><div style="font-size: 72px; color: #C8A84E; line-height: 1; margin-bottom: 12px;">"</div><blockquote style="font-size: 26px; line-height: 1.45; font-style: italic; color: #0D0D0D; margin-bottom: 24px;">The single best training experience I've had. Every rep matters here.</blockquote><div style="font-size: 14px; color: #666;"><strong style="color: #0D0D0D; display: block; margin-bottom: 2px;">First Last</strong>Team · Role</div></div></section>`
     }
   ];
 
   function renderTemplates() {
     tplGrid.innerHTML = '';
-    TEMPLATES.forEach((t, i) => {
+    TEMPLATES.forEach(t => {
       const card = document.createElement('div');
       card.className = 'tpl-card';
-      card.innerHTML = `
-        <div class="tpl-thumb">
-          ${tplIcon(t.icon)}
-          <span>${t.name.toUpperCase()}</span>
-        </div>
-        <div class="tpl-name">${t.name}</div>
-        <div class="tpl-desc">${t.desc}</div>
-      `;
+      card.innerHTML = `<div class="tpl-thumb">${tplIcon(t.icon)}<span>${t.name.toUpperCase()}</span></div><div class="tpl-name">${t.name}</div><div class="tpl-desc">${t.desc}</div>`;
       card.addEventListener('click', () => insertTemplate(t));
       tplGrid.appendChild(card);
     });
@@ -668,33 +701,23 @@
       default: return s + '<circle cx="12" cy="12" r="4"/>' + e;
     }
   }
-
   function insertTemplate(t) {
     const doc = state.iframeDoc;
     const wrap = doc.createElement('div');
     wrap.innerHTML = t.html.trim();
     const sec = wrap.firstElementChild;
-    // Insert before footer if present, else at end of body
     const footer = doc.querySelector('body > footer');
     if (footer) footer.parentElement.insertBefore(sec, footer);
     else doc.body.appendChild(sec);
-    // Instrument the new content
-    instrumentTexts(sec);
-    instrumentImages(sec);
-    instrumentLinks(sec);
+    wrapMixedContentTextNodes(sec);
+    instrumentTexts(sec); instrumentImages(sec); instrumentLinks(sec);
     instrumentSections(doc);
-    tplModal.hidden = false; // will be hidden below
     tplModal.hidden = true;
-    markDirty();
-    renderSectionsList();
+    markDirty(); renderSectionsList();
     sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    showToast('Added "' + t.name + '" — edit text/images inline, move it with the sidebar');
+    showToast('Added "' + t.name + '"');
   }
-
-  $('#btn-add-section').addEventListener('click', () => {
-    renderTemplates();
-    tplModal.hidden = false;
-  });
+  $('#btn-add-section').addEventListener('click', () => { renderTemplates(); tplModal.hidden = false; });
   $('#tpl-cancel').addEventListener('click', () => { tplModal.hidden = true; });
 
   // ============================================================
@@ -703,13 +726,6 @@
   const dirtyCountEl = $('#dirty-count');
   function markDirty() {
     state.dirty = true;
-    // Crude count: text-edited + pending images. Good enough to signal "has changes".
-    const doc = state.iframeDoc;
-    let n = state.pendingImages.size;
-    if (doc) {
-      // Anything touched by contenteditable we don't track perfectly; approximate via
-      // "number of sections" vs original. Simpler: just show "●" when dirty.
-    }
     dirtyCountEl.textContent = '●';
     dirtyCountEl.classList.add('dirty');
   }
@@ -720,48 +736,44 @@
   }
 
   // ============================================================
-  //  TOOLBAR ACTIONS
+  //  TOOLBAR
   // ============================================================
   $('#btn-reset').addEventListener('click', async () => {
-    if (state.dirty && !confirm('Discard all unsaved edits and reload from staging?')) return;
+    if (state.dirty && !confirm('Discard unsaved edits and reload from staging?')) return;
     state.pendingImages.clear();
-    await loadStagingIntoFrame();
-    clearDirty();
+    await loadPageIntoFrame(state.page);
     showToast('Reset to current staging');
   });
   $('#btn-preview').addEventListener('click', () => {
-    window.open('/stagingsite/?ts=' + Date.now(), '_blank');
+    window.open(state.page.previewUrl + '?ts=' + Date.now(), '_blank');
   });
   $('#btn-push').addEventListener('click', () => pushToStaging());
 
   // ============================================================
-  //  PUSH TO STAGING  (full DOM serialization)
+  //  PUSH TO STAGING
   // ============================================================
   async function pushToStaging() {
     if (!state.frameReady) return;
     const pat = await ensurePat(); if (!pat) return;
     setStatus('pushing…');
     try {
-      // Snapshot iframe DOM, strip our instrumentation, re-inject staging markers.
       const doc = state.iframeDoc;
-      const cloneHtml = doc.documentElement.outerHTML;
-      let out = '<!DOCTYPE html>\n' + cloneHtml;
+      let out = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
 
-      // Remove editor-injected style
+      // Strip editor-only artifacts
       out = out.replace(/<style id="editor-injected-style">[\s\S]*?<\/style>/g, '');
-      // Strip our data-* edit attributes and contenteditable residue
+      out = out.replace(/<button[^>]*class="editor-link-pencil"[^>]*>[\s\S]*?<\/button>/g, '');
       out = out.replace(/\s+data-edit-text="[^"]*"/g, '');
       out = out.replace(/\s+data-edit-img="[^"]*"/g, '');
       out = out.replace(/\s+data-edit-link="[^"]*"/g, '');
       out = out.replace(/\s+data-section="[^"]*"/g, '');
       out = out.replace(/\s+data-section-label="[^"]*"/g, '');
-      out = out.replace(/\s+data-replaced-src="[^"]*"/g, '');
+      out = out.replace(/\s+data-text-wrap="[^"]*"/g, '');
       out = out.replace(/\s+contenteditable="[^"]*"/g, '');
       out = out.replace(/\s+class="editor-image-pending"/g, '');
       out = out.replace(/(class="[^"]*?)\s+editor-image-pending([^"]*")/g, '$1$2');
 
-      // Ensure staging base tag is present (we stripped banner earlier on load;
-      // the base tag should still be there. But re-ensure for safety.)
+      // Ensure staging base present
       if (!/<!-- staging-base-start -->/.test(out)) {
         if (/<base\s[^>]*>/i.test(out)) {
           out = out.replace(/<base\s[^>]*>/i, '<!-- staging-base-start --><base href="/"><!-- staging-base-end -->');
@@ -769,31 +781,28 @@
           out = out.replace(/<meta name="viewport"[^>]*>/i, m => m + '\n  <!-- staging-base-start --><base href="/"><!-- staging-base-end -->');
         }
       }
-      // Re-inject staging banner just before </body>
+      // Re-inject staging banner
       if (!/<!-- staging-banner-start -->/.test(out)) {
         out = out.replace(/<\/body>/i,
           '  <!-- staging-banner-start -->\n  <script src="/stagingsite/banner.js" defer><\/script>\n  <!-- staging-banner-end -->\n</body>');
       }
 
-      // Push images first
       let imgCount = 0;
       for (const [fname, { bytes }] of state.pendingImages) {
         setStatus(`uploading ${fname}…`);
-        // For new images added via templates, put them at repo root (where other imgs live)
-        // so both /stagingsite and / can reference them.
         await putFile(fname, bytes, `Editor: add/replace image ${fname}`);
         imgCount++;
       }
 
-      setStatus('uploading index.html…');
-      await putFileText(STAGING_HTML_PATH, out, `Editor: update staging (full DOM, ${imgCount} image${imgCount===1?'':'s'})`);
+      setStatus('uploading ' + state.page.stagingPath + '…');
+      await putFileText(state.page.stagingPath, out, `Editor: update ${state.page.stagingPath} (${imgCount} image${imgCount===1?'':'s'})`);
 
       state.pendingImages.clear();
       state.originalHtml = out;
       clearDirty();
       setStatus('pushed ✓');
       showToast('Pushed to staging. Opening preview…');
-      setTimeout(() => window.open('/stagingsite/?ts=' + Date.now(), '_blank'), 600);
+      setTimeout(() => window.open(state.page.previewUrl + '?ts=' + Date.now(), '_blank'), 600);
     } catch (err) {
       setStatus('push failed');
       showToast('Push failed: ' + err.message, true);
@@ -822,14 +831,14 @@
   }
   async function getFileSha(path) {
     try {
-      const j = await gh(`/contents/${encodeURIComponent(path).replace(/%2F/g,'/')}?ref=${BRANCH}`);
+      const j = await gh(`/contents/${path.replace(/^\/+/, '')}?ref=${BRANCH}`);
       return j.sha;
     } catch (e) { return null; }
   }
   async function putFile(path, bytes, message) {
     const sha = await getFileSha(path);
     const b64 = bytesToBase64(bytes);
-    await gh(`/contents/${encodeURIComponent(path).replace(/%2F/g,'/')}`, {
+    await gh(`/contents/${path.replace(/^\/+/, '')}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, content: b64, branch: BRANCH, ...(sha ? { sha } : {}) }),
@@ -838,7 +847,7 @@
   async function putFileText(path, text, message) {
     const sha = await getFileSha(path);
     const b64 = utf8ToBase64(text);
-    await gh(`/contents/${encodeURIComponent(path).replace(/%2F/g,'/')}`, {
+    await gh(`/contents/${path.replace(/^\/+/, '')}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, content: b64, branch: BRANCH, ...(sha ? { sha } : {}) }),
@@ -854,14 +863,13 @@
   function utf8ToBase64(s) { return btoa(unescape(encodeURIComponent(s))); }
 
   // ============================================================
-  //  PAT FLOW
+  //  PAT
   // ============================================================
   async function ensurePat() {
     let pat = localStorage.getItem(PAT_KEY);
     if (pat) return pat;
     return new Promise(resolve => {
-      const modal = $('#pat-modal');
-      const input = $('#pat-input');
+      const modal = $('#pat-modal'); const input = $('#pat-input');
       input.value = ''; modal.hidden = false; input.focus();
       $('#pat-cancel').onclick = () => { modal.hidden = true; resolve(null); };
       $('#pat-save').onclick = () => {
