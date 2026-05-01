@@ -520,10 +520,17 @@
       function closeModal() { modal.hidden = true; }
 
       // Detect mobile / touch devices — for them, skip the modal and just
-      // open mailto: directly (their default email app handles it cleanly).
-      // Desktop users get the modal so they can choose Gmail/Copy.
+      // open mailto: directly. Multiple signals so iOS / Android / iPad
+      // all reliably trigger.
       function isMobile() {
-        return window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+        try {
+          if (window.matchMedia('(pointer: coarse)').matches) return true;
+        } catch (_) {}
+        if ('ontouchstart' in window) return true;
+        if (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) return true;
+        if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) return true;
+        if (window.innerWidth <= 900) return true;
+        return false;
       }
       document.querySelectorAll('.apply-trigger').forEach(b => {
         b.addEventListener('click', () => {
