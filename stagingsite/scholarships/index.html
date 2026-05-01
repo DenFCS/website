@@ -284,6 +284,44 @@
       .footer-inner { flex-direction: column; align-items: center; text-align: center; gap: var(--sp-md); }
       .footer-meta { flex-wrap: wrap; justify-content: center; gap: var(--sp-md); }
     }
+
+    /* ----------- Apply modal ----------- */
+    .apply-modal {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .apply-modal[hidden] { display: none !important; }
+    .apply-card {
+      background: var(--n-50); color: var(--n-1000);
+      border: 1px solid var(--gold-400); border-radius: 4px;
+      max-width: 460px; width: 100%;
+      padding: 32px 28px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+    .apply-card h3 {
+      font-size: 22px; line-height: 1.2; margin-bottom: 8px;
+      letter-spacing: -0.01em; text-transform: none;
+    }
+    .apply-card p {
+      color: var(--n-700); font-size: 15px; line-height: 22px;
+      margin-bottom: var(--sp-lg);
+    }
+    .apply-options { display: flex; flex-direction: column; gap: 10px; }
+    .apply-options .btn { width: 100%; padding: 14px 18px; }
+    .apply-options .apply-cancel {
+      margin-top: 6px;
+      background: transparent; color: var(--n-700);
+      border: none; cursor: pointer;
+      font-family: var(--f-util); text-transform: uppercase;
+      font-size: 11px; letter-spacing: 0.15em; padding: 10px;
+    }
+    .apply-options .apply-cancel:hover { color: var(--n-1000); }
+    .apply-feedback {
+      margin-top: 10px; font-size: 12px; color: var(--gold-400);
+      text-align: center; min-height: 16px;
+    }
   </style>
 </head>
 <body>
@@ -319,7 +357,7 @@
       DenFCS scholarships make pro-level training in Houston accessible to athletes who otherwise couldn't get in the door. <strong>Built by pro players</strong>, for the next generation that's earned the rep but not the room.
     </p>
     <div class="hero-cta">
-      <a href="mailto:team@lionsdenhtx.com?subject=DenFCS%20Scholarship%20Application&amp;body=Hi%20\u2014%20I%27d%20like%20to%20apply%20for%20a%20DenFCS%20scholarship.%0A%0AName%3A%0AAge%2FGrade%3A%0APosition%3A%0ATeam%2FSchool%3A%0ABrief%20background%3A%0A%0AThanks%21" class="btn btn-primary btn-xl">Apply Now &rarr;</a>
+      <button class="btn btn-primary btn-xl apply-trigger" type="button">Apply Now &rarr;</button>
       <a href="#how-it-works" class="btn btn-secondary">How it works</a>
     </div>
   </section>
@@ -392,7 +430,7 @@
       <div class="eyebrow" style="margin-bottom: var(--sp-md); display: inline-block;">— Ready —</div>
       <h2>Send your application.</h2>
       <p>Two minutes of your time, possibly the start of a different season.</p>
-      <a href="mailto:team@lionsdenhtx.com?subject=DenFCS%20Scholarship%20Application&amp;body=Hi%20\u2014%20I%27d%20like%20to%20apply%20for%20a%20DenFCS%20scholarship.%0A%0AName%3A%0AAge%2FGrade%3A%0APosition%3A%0ATeam%2FSchool%3A%0ABrief%20background%3A%0A%0AThanks%21" class="btn btn-primary btn-xl">Apply Now &rarr;</a>
+      <button class="btn btn-primary btn-xl apply-trigger" type="button">Apply Now &rarr;</button>
     </div>
   </section>
 
@@ -407,18 +445,107 @@
     </div>
   </footer>
 
+  <!-- Apply modal: works on every device. -->
+  <div id="apply-modal" class="apply-modal" hidden role="dialog" aria-labelledby="apply-modal-title">
+    <div class="apply-card">
+      <h3 id="apply-modal-title">Apply for a DenFCS Scholarship</h3>
+      <p>Pick how you'd like to send your application. We'll receive it either way.</p>
+      <div class="apply-options">
+        <a id="apply-mailto" class="btn btn-primary" href="#">Open in my email app</a>
+        <a id="apply-gmail" class="btn btn-secondary" href="#" target="_blank" rel="noopener">Open in Gmail (browser)</a>
+        <button id="apply-copy" class="btn btn-ghost" type="button" style="background: transparent; color: var(--n-1000); border-color: var(--n-500);">Copy email + details</button>
+        <div class="apply-feedback" id="apply-feedback"></div>
+        <button class="apply-cancel" type="button" id="apply-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // ---------- Mobile nav toggle ----------
     (function(){
       const btn = document.getElementById('nav-toggle');
       const links = document.getElementById('nav-links');
-      if (!btn || !links) return;
-      btn.addEventListener('click', () => {
-        const open = links.classList.toggle('open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (btn && links) {
+        btn.addEventListener('click', () => {
+          const open = links.classList.toggle('open');
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+          links.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+        }));
+      }
+    })();
+
+    // ---------- Apply modal: works on desktop AND mobile ----------
+    (function(){
+      const TO = 'team@lionsdenhtx.com';
+      const SUBJECT = 'DenFCS Scholarship Application';
+      const BODY = [
+        'DenFCS Scholarship Application',
+        '',
+        'NAME: ',
+        'AGE: ',
+        'SCHOOL: ',
+        'TRAVEL TEAM: ',
+        'POSITION: ',
+        '',
+        '----------------------------------------',
+        'Please explain how a DenFCS scholarship would help you and your athlete\'s career, and why you want to commit to training through this program with us:',
+        '----------------------------------------',
+        '',
+        '',
+        '',
+        '',
+        '',
+        'Thanks!',
+      ].join('\n');
+
+      const modal = document.getElementById('apply-modal');
+      const mailtoLink = document.getElementById('apply-mailto');
+      const gmailLink = document.getElementById('apply-gmail');
+      const copyBtn = document.getElementById('apply-copy');
+      const feedback = document.getElementById('apply-feedback');
+      const cancelBtn = document.getElementById('apply-cancel');
+
+      // Build URLs each time the modal opens — fine to precompute
+      const encSubject = encodeURIComponent(SUBJECT);
+      const encBody = encodeURIComponent(BODY);
+      mailtoLink.href = `mailto:${TO}?subject=${encSubject}&body=${encBody}`;
+      gmailLink.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(TO)}&su=${encSubject}&body=${encBody}`;
+
+      function openModal() {
+        feedback.textContent = '';
+        modal.hidden = false;
+      }
+      function closeModal() { modal.hidden = true; }
+
+      document.querySelectorAll('.apply-trigger').forEach(b => {
+        b.addEventListener('click', openModal);
       });
-      links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        links.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
+      cancelBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+      copyBtn.addEventListener('click', async () => {
+        const payload = `To: ${TO}\nSubject: ${SUBJECT}\n\n${BODY}`;
+        try {
+          await navigator.clipboard.writeText(payload);
+          feedback.textContent = '✓ Copied. Paste into any email or message.';
+        } catch (err) {
+          // Fallback: select-and-copy via a temporary textarea
+          const ta = document.createElement('textarea');
+          ta.value = payload; document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); feedback.textContent = '✓ Copied.'; }
+          catch (e2) { feedback.textContent = 'Could not copy. Tap the email links above.'; }
+          ta.remove();
+        }
+      });
+
+      // After clicking either email link, close the modal so user returns to the page
+      [mailtoLink, gmailLink].forEach(a => a.addEventListener('click', () => {
+        setTimeout(closeModal, 400);
       }));
     })();
   </script>
