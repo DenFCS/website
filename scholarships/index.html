@@ -519,8 +519,20 @@
       }
       function closeModal() { modal.hidden = true; }
 
+      // Detect mobile / touch devices — for them, skip the modal and just
+      // open mailto: directly (their default email app handles it cleanly).
+      // Desktop users get the modal so they can choose Gmail/Copy.
+      function isMobile() {
+        return window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768;
+      }
       document.querySelectorAll('.apply-trigger').forEach(b => {
-        b.addEventListener('click', openModal);
+        b.addEventListener('click', () => {
+          if (isMobile()) {
+            window.location.href = mailtoLink.href;
+          } else {
+            openModal();
+          }
+        });
       });
       cancelBtn.addEventListener('click', closeModal);
       modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
