@@ -31,6 +31,14 @@
       prodPath: 'summerprogram/index.html',
       previewUrl: '/stagingsite/summerprogram/',
     },
+    {
+      id: 'scholarships',
+      label: 'Scholarships (/scholarships/)',
+      stagingSrc: '/stagingsite/scholarships/index.html',
+      stagingPath: 'stagingsite/scholarships/index.html',
+      prodPath: 'scholarships/index.html',
+      previewUrl: '/stagingsite/scholarships/',
+    },
   ];
 
   const state = {
