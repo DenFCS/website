@@ -153,19 +153,28 @@
 
     /* Hero */
     .hero {
-      position: relative; padding: var(--sp-4xl) var(--sp-xl) var(--sp-3xl);
+      position: relative; padding: 140px var(--sp-xl) 110px;
       text-align: center; overflow: hidden;
-      background: radial-gradient(ellipse at 50% 0%, rgba(200,168,78,0.10) 0%, transparent 60%), var(--n-0);
+      background-image:
+        linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.85) 100%),
+        url("den_outside_image.jpg");
+      background-size: cover;
+      background-position: center 35%;
+      background-color: var(--n-0);
+      min-height: 70vh;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
     .hero::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: linear-gradient(90deg, transparent, var(--gold-400), transparent);
     }
-    .hero-eyebrow { margin-bottom: var(--sp-md); display: inline-block; }
-    .hero h1 { margin-bottom: var(--sp-lg); }
+    .hero > * { position: relative; z-index: 1; }
+    .hero-eyebrow { margin-bottom: var(--sp-md); display: inline-block; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+    .hero h1 { margin-bottom: var(--sp-lg); text-shadow: 0 2px 20px rgba(0,0,0,0.85); }
     .hero-tag {
       max-width: 720px; margin: 0 auto var(--sp-2xl);
-      font-size: 18px; line-height: 30px; color: var(--n-700);
+      font-size: 18px; line-height: 30px; color: var(--n-800);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.85);
     }
     .hero-tag strong { color: var(--n-1000); font-weight: 500; }
     .hero-cta { display: flex; gap: var(--sp-md); justify-content: center; flex-wrap: wrap; }
