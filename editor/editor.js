@@ -39,6 +39,30 @@
       prodPath: 'scholarships/index.html',
       previewUrl: '/stagingsite/scholarships/',
     },
+    {
+      id: 'blogs',
+      label: 'Journal — Index (/blogs/)',
+      stagingSrc: '/stagingsite/blogs/index.html',
+      stagingPath: 'stagingsite/blogs/index.html',
+      prodPath: 'blogs/index.html',
+      previewUrl: '/stagingsite/blogs/',
+    },
+    {
+      id: 'blog-template',
+      label: 'Journal — Template (/blogs/template/)',
+      stagingSrc: '/stagingsite/blogs/template/index.html',
+      stagingPath: 'stagingsite/blogs/template/index.html',
+      prodPath: 'blogs/template/index.html',
+      previewUrl: '/stagingsite/blogs/template/',
+    },
+    {
+      id: 'blog-welcome',
+      label: 'Journal — Welcome post (/blogs/welcome/)',
+      stagingSrc: '/stagingsite/blogs/welcome/index.html',
+      stagingPath: 'stagingsite/blogs/welcome/index.html',
+      prodPath: 'blogs/welcome/index.html',
+      previewUrl: '/stagingsite/blogs/welcome/',
+    },
   ];
 
   const state = {

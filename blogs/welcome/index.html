@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!--
+  BLOG POST TEMPLATE
+  ==================
+  To create a new blog post:
+    1. Copy this folder: /blogs/template/  →  /blogs/YOUR-SLUG/
+    2. Open YOUR-SLUG/index.html and change:
+        • <title> tag
+        • <meta name="description">
+        • Post header (tag, date, author, title, subtitle)
+        • Cover image (post-cover img src + alt)
+        • Body copy (everything inside <article class="post-body">)
+    3. Add a card to /blogs/index.html linking to /blogs/YOUR-SLUG/
+    4. Push to staging, deploy to production.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to the Journal — The Den × FCS</title>
+  <meta name="description" content="Why we started this Journal, what to expect, and how it fits into the way we build players at The Den × FCS." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+
+    :root {
+      --n-0: #000000; --n-50: #0A0A0A; --n-100: #141414; --n-200: #1E1E1E;
+      --n-300: #2A2A2A; --n-500: #555555; --n-600: #7A7A7A; --n-700: #A3A3A3;
+      --n-800: #C9C9C9; --n-900: #F0F0F0; --n-1000: #FFFFFF;
+      --gold-300: #E0C872; --gold-400: #C8A84E; --gold-600: #8C7530; --gold-700: #5C4D1F;
+      --f-head: 'Orbitron', sans-serif;
+      --f-body: 'Newsreader', serif;
+      --f-util: 'Golos Text', sans-serif;
+      --sp-md: 16px; --sp-lg: 24px; --sp-xl: 32px; --sp-2xl: 48px; --sp-3xl: 72px; --sp-4xl: 96px;
+    }
+    html, body { background: var(--n-0); color: var(--n-1000); }
+    body { font-family: var(--f-body); font-weight: 300; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    h1, h2, h3, h4 { font-family: var(--f-head); font-weight: 800; letter-spacing: -0.01em; line-height: 1.15; text-transform: uppercase; }
+    h1 { font-size: 56px; }
+    h2 { font-size: 32px; }
+    h3 { font-size: 22px; }
+    @media (max-width: 768px) {
+      h1 { font-size: 36px; }
+      h2 { font-size: 24px; }
+      h3 { font-size: 20px; }
+    }
+
+    em.accent { font-style: italic; color: var(--gold-400); }
+    .eyebrow {
+      font-family: var(--f-util); font-weight: 500; font-size: 11px;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-400);
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 24px; border-radius: 2px;
+      font-family: var(--f-util); font-weight: 600;
+      font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; border: 1px solid transparent;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .btn-primary { background: var(--gold-400); color: var(--n-0); border-color: var(--gold-400); }
+    .btn-primary:hover { background: var(--gold-300); border-color: var(--gold-300); }
+    .btn-secondary { background: transparent; color: var(--n-1000); border-color: var(--n-500); }
+    .btn-secondary:hover { border-color: var(--gold-400); color: var(--gold-400); }
+
+    /* Nav */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--n-200);
+    }
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto;
+      padding: 10px var(--sp-xl);
+      display: flex; align-items: center; justify-content: space-between; gap: var(--sp-lg);
+    }
+    .nav-logo {
+      display: flex; align-items: center; line-height: 0;
+      background: #ffffff; padding: 8px 14px; border-radius: 6px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-logo-img { height: 52px; width: auto; }
+    .nav-toggle {
+      display: none; background: transparent; border: none; padding: 8px;
+      width: 40px; height: 40px; align-items: center; justify-content: center;
+      margin-left: auto; cursor: pointer;
+    }
+    .nav-toggle span {
+      display: block; width: 22px; height: 2px; background: var(--n-1000); position: relative;
+    }
+    .nav-toggle span::before, .nav-toggle span::after {
+      content: ''; position: absolute; left: 0; width: 22px; height: 2px;
+      background: var(--n-1000); transition: transform .25s ease, top .25s ease;
+    }
+    .nav-toggle span::before { top: -7px; } .nav-toggle span::after { top: 7px; }
+    .nav-links { display: flex; align-items: center; gap: var(--sp-xl); }
+    .nav-links a {
+      font-family: var(--f-util); font-weight: 500;
+      font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--n-700); transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold-400); }
+    .nav-auth {
+      display: flex; align-items: center; gap: 12px;
+      padding-left: var(--sp-lg); margin-left: var(--sp-md);
+      border-left: 1px solid var(--n-300);
+    }
+    .nav-auth .btn { padding: 10px 16px; font-size: 11px; }
+    @media (max-width: 900px) {
+      .nav-toggle { display: inline-flex; }
+      .nav-inner { padding: 12px var(--sp-lg); }
+      .nav-links {
+        position: absolute; top: 100%; left: 0; right: 0;
+        flex-direction: column; align-items: stretch;
+        background: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--n-200);
+        padding: 8px 0 12px; gap: 0; display: none;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links > a {
+        display: block; padding: 14px var(--sp-lg);
+        font-size: 13px; border-bottom: 1px solid var(--n-200);
+      }
+      .nav-auth {
+        padding: 12px var(--sp-lg) 0;
+        border-left: none; margin-left: 0; justify-content: center;
+      }
+      .nav-auth .btn { width: 100%; padding: 12px; font-size: 12px; }
+      .nav-logo-img { height: 42px; }
+    }
+    @media (max-width: 640px) { .nav-logo-img { height: 36px; } }
+
+    /* Post header */
+    .post-header {
+      padding: var(--sp-4xl) var(--sp-xl) var(--sp-2xl);
+      max-width: 820px; margin: 0 auto; text-align: center;
+    }
+    .post-header .eyebrow { margin-bottom: var(--sp-md); display: inline-block; }
+    .post-header h1 { margin-bottom: var(--sp-lg); }
+    .post-header .subtitle {
+      font-family: var(--f-body); font-weight: 300; font-style: italic;
+      font-size: 20px; line-height: 32px; color: var(--n-700);
+      max-width: 640px; margin: 0 auto var(--sp-lg);
+    }
+    .post-meta {
+      display: inline-flex; gap: 14px; align-items: center;
+      font-family: var(--f-util); font-weight: 500; font-size: 11px;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--n-600);
+    }
+    .post-meta-dot { color: var(--gold-400); }
+    @media (max-width: 768px) {
+      .post-header { padding: var(--sp-3xl) var(--sp-lg) var(--sp-xl); }
+      .post-header .subtitle { font-size: 17px; line-height: 27px; }
+    }
+
+    /* Cover image */
+    .post-cover {
+      max-width: 1080px; margin: 0 auto var(--sp-2xl);
+      padding: 0 var(--sp-xl);
+    }
+    .post-cover img {
+      width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+      border-radius: 6px;
+    }
+    @media (max-width: 768px) { .post-cover { padding: 0; margin-bottom: var(--sp-xl); } .post-cover img { border-radius: 0; } }
+
+    /* Post body */
+    .post-body {
+      max-width: 720px; margin: 0 auto;
+      padding: 0 var(--sp-xl) var(--sp-4xl);
+      font-family: var(--f-body); font-weight: 300;
+      font-size: 19px; line-height: 32px; color: var(--n-800);
+    }
+    @media (max-width: 768px) {
+      .post-body { padding: 0 var(--sp-lg) var(--sp-3xl); font-size: 17px; line-height: 30px; }
+    }
+    .post-body > * + * { margin-top: var(--sp-lg); }
+    .post-body h2 {
+      margin-top: var(--sp-2xl); margin-bottom: var(--sp-md);
+      color: var(--n-1000);
+    }
+    .post-body h3 {
+      margin-top: var(--sp-xl); margin-bottom: var(--sp-sm, 10px);
+      color: var(--n-1000);
+    }
+    .post-body p { margin-bottom: 0; }
+    .post-body strong { color: var(--n-1000); font-weight: 500; }
+    .post-body a { color: var(--gold-400); border-bottom: 1px solid rgba(200,168,78,0.4); }
+    .post-body a:hover { border-bottom-color: var(--gold-400); }
+    .post-body blockquote {
+      border-left: 3px solid var(--gold-400);
+      padding: 6px 0 6px 20px;
+      color: var(--n-900); font-style: italic; font-size: 21px; line-height: 32px;
+      margin: var(--sp-xl) 0;
+    }
+    .post-body ul, .post-body ol { padding-left: 24px; }
+    .post-body li { margin-bottom: 8px; }
+    .post-body img {
+      border-radius: 4px; margin: var(--sp-xl) 0; width: 100%;
+    }
+    .post-body hr {
+      border: none; height: 1px; background: var(--n-300);
+      margin: var(--sp-2xl) 0;
+    }
+    .post-body figcaption {
+      color: var(--n-600); font-family: var(--f-util); font-weight: 400;
+      font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase;
+      text-align: center; margin-top: -8px;
+    }
+
+    /* Post footer / navigation */
+    .post-footer {
+      border-top: 1px solid var(--n-200);
+      padding: var(--sp-3xl) var(--sp-xl);
+      text-align: center;
+    }
+    .post-footer-back {
+      display: inline-flex; gap: 8px; align-items: center;
+      font-family: var(--f-util); font-weight: 600; font-size: 12px;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-400);
+    }
+    .post-footer-back:hover { color: var(--gold-300); }
+
+    /* Footer */
+    footer {
+      background: var(--n-0);
+      border-top: 1px solid var(--n-200);
+      padding: var(--sp-2xl) var(--sp-xl);
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: var(--sp-lg);
+    }
+    .footer-brand {
+      font-family: var(--f-head); font-weight: 800;
+      font-size: 14px; letter-spacing: 0.1em;
+      color: var(--n-1000); text-transform: uppercase;
+    }
+    .footer-meta {
+      display: flex; gap: var(--sp-xl);
+      font-family: var(--f-util); font-weight: 500;
+      font-size: 11px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--n-600);
+    }
+    .footer-meta a:hover { color: var(--gold-400); }
+    @media (max-width: 640px) {
+      .footer-inner { flex-direction: column; align-items: center; text-align: center; gap: var(--sp-md); }
+      .footer-meta { flex-wrap: wrap; justify-content: center; gap: var(--sp-md); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo" aria-label="The Den x FCS - home">
+        <img src="/denfcs-logo.png" alt="The Den x FCS" class="nav-logo-img" />
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span>
+      </button>
+      <div class="nav-links" id="nav-links">
+        <a href="/#featured">Featured</a>
+        <a href="/#alumni">Pros</a>
+        <a href="/#coaches">Coaches</a>
+        <a href="/#memberships">Memberships</a>
+        <a href="/#locations">Locations</a>
+        <a href="/#app">App</a>
+        <a href="/scholarships/">Scholarships</a>
+        <a href="/blogs/" class="active">Journal</a>
+        <a href="https://team.lionsdenhtx.com/" target="_blank" rel="noopener noreferrer">Shop</a>
+        <div class="nav-auth">
+          <a href="https://team.lionsdenhtx.com/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Online Portal</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="eyebrow">— Journal —</div>
+    <h1>Welcome to <em class="accent">the Journal.</em></h1>
+    <p class="subtitle">Why we're writing this thing, what you can expect from it, and how it fits into the way we build players at The Den.</p>
+    <div class="post-meta">
+      <span>April 2026</span>
+      <span class="post-meta-dot">·</span>
+      <span>Matt Tabor</span>
+      <span class="post-meta-dot">·</span>
+      <span>3 min read</span>
+    </div>
+  </header>
+
+  <div class="post-cover">
+    <img src="/den_outside_image.jpg" alt="The Den × FCS facility exterior." />
+  </div>
+
+  <article class="post-body">
+
+    <p>A place is only as honest as what it's willing to write down. That's what this Journal is for.</p>
+
+    <p>We built The Den × FCS to be the place in Houston where serious players train the way pros actually train. Measurement, structure, real coaching, real reps. We've been running that operation quietly for a while now. Coaches doing the work. Athletes hitting numbers. Nobody talking much about it outside the walls.</p>
+
+    <h2>What this is</h2>
+
+    <p>The Journal is where we put on paper what usually stays inside the building. Training philosophy. Player stories. What we're seeing in the cage. What we're seeing on the mound. Why we structure programs the way we do. What worked, what didn't, and what we're changing because of it.</p>
+
+    <p>Some pieces will be short — <strong>a lesson from a single bullpen, a note about arm care, a video breakdown</strong>. Others will be long — how we think about the summer program, why we care about the tools we care about, how our coaches came up.</p>
+
+    <blockquote>
+      Details equal numbers. Numbers equal outcomes. If we can't explain the details, we're not doing the work.
+    </blockquote>
+
+    <h2>Who's writing</h2>
+
+    <p>The coaches. The founders. Occasionally the athletes themselves. Everyone who writes here trains inside the walls. Nothing gets published that hasn't been road-tested with real players.</p>
+
+    <h2>What to expect</h2>
+
+    <ul>
+      <li><strong>Player development pieces</strong> — pitching mechanics, hitting approach, strength and conditioning, arm care, recovery.</li>
+      <li><strong>Program notes</strong> — what a Summer Program week actually looks like. What Foundation members get. What Two-Way athletes go through.</li>
+      <li><strong>Alumni check-ins</strong> — updates from Den athletes now in pro ball.</li>
+      <li><strong>Coach POVs</strong> — direct from the people running the sessions. Tyler Beede on pitching. Eric Fisher on catching. Kyle Porter on strength. And more.</li>
+    </ul>
+
+    <h2>Why now</h2>
+
+    <p>Because too many training decisions in this sport get made on vibes. Kids picking programs based on what their buddy did, or a coach's Instagram, or what the last radar reading was at a showcase.</p>
+
+    <p>We think you deserve better. If you're going to spend a summer training somewhere — or a year, or a career — you should know exactly why the plan you're on is the plan you're on. This Journal is one way we can show our work.</p>
+
+    <hr />
+
+    <p><strong>Want to train here?</strong> <a href="/#memberships">Look at memberships</a>, <a href="/summerprogram/">check the Summer Program</a>, or <a href="mailto:team@lionsdenhtx.com?subject=Inquire%20with%20DenFCS&amp;body=I%20am%20interested%20in%20joining%20DenFCS%21">reach out directly</a>. We're here.</p>
+
+  </article>
+
+  <div class="post-footer">
+    <a href="/blogs/" class="post-footer-back">&larr; Back to Journal</a>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">The Den × FCS</div>
+      <div class="footer-meta">
+        <a href="/">Home</a>
+        <a href="mailto:team@lionsdenhtx.com">Contact</a>
+        <a href="https://team.lionsdenhtx.com/" target="_blank" rel="noopener noreferrer">Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('nav-toggle');
+      const links = document.getElementById('nav-links');
+      if (!btn || !links) return;
+      btn.addEventListener('click', () => {
+        const open = links.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        links.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }));
+    })();
+  </script>
+  <script src="/email-handler.js" defer></script>
+</body>
+</html>
