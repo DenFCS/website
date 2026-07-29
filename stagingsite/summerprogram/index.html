@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- staging-base-start --><base href="/"><!-- staging-base-end -->
-<title>THE DEN × FCS | Summer 2026 (Staging)</title>
+<title>THE DEN × FCS | Fall 2026 (Staging)</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -151,7 +151,7 @@
   .included-desc { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
 
   /* TIERS */
-  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+  .tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
   .tier { background: var(--dark-card); border: 1px solid #222; padding: 28px 20px; text-align: center; position: relative; transition: border-color 0.3s; }
   .tier:hover { border-color: var(--gold); }
   .tier.featured { border-color: var(--gold); background: linear-gradient(180deg, rgba(200,168,78,0.06) 0%, var(--dark-card) 100%); }
@@ -197,6 +197,9 @@
   .footer { text-align: center; padding: 24px 40px; border-top: 1px solid #1E1E1E; }
   .footer-text { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 12px; color: var(--text-muted); letter-spacing: 1px; line-height: 1.8; }
 
+  @media (max-width: 900px) {
+    .tiers { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 768px) {
     .tiers, .discounts, .locations { grid-template-columns: 1fr; }
     .steps { grid-template-columns: repeat(2, 1fr); }
@@ -214,9 +217,9 @@
 
 <div class="hero">
   <div class="logo-text">THE DEN <span class="x">&times;</span> FCS</div>
-  <div class="subtitle">Summer Training Program</div>
-  <div class="date-line">June &mdash; August 2026 &nbsp;|&nbsp; Three Locations Across Houston</div>
-  <p class="tagline">This isn&rsquo;t a lesson package. It&rsquo;s a <strong>targeted development system</strong>. We learn the player. We understand what they need. And we build a summer around making them better &mdash; stronger, faster, more competitive, more prepared. <strong>No better place to be.</strong></p>
+  <div class="subtitle">Fall Training Program</div>
+  <div class="date-line">August &mdash; December 2026 &nbsp;|&nbsp; Three Locations Across Houston</div>
+  <p class="tagline">This isn&rsquo;t a lesson package. It&rsquo;s a <strong>targeted development system</strong>. We learn the player. We understand what they need. And we build a fall season around making them better &mdash; stronger, faster, more competitive, more prepared. <strong>No better place to be.</strong></p>
   <div class="badge">Limited Enrollment &mdash; 230 Total Spots Across 3 Facilities</div>
 </div>
 
@@ -298,7 +301,7 @@
   <div class="section-title">The Process</div>
   <div class="process-block">
     <div class="process-title">Intake Survey &rarr; Staff Sit-Down &rarr; Individualized Plan</div>
-    <div class="process-text">Every athlete completes a <em>summer intake survey</em>. Our staff sits down, reviews the data, and determines the right programs across lifting, throwing, hitting, and recovery. Our <em>player development systems software</em> generates an individualized plan &mdash; strength programs, throwing programs, throwing schedule, and workload management &mdash; all built around <em>your goals</em>. Velocity. Command. Power. Speed. The summer is hyper-focused on hitting them.</div>
+    <div class="process-text">Every athlete completes a <em>fall intake survey</em>. Our staff sits down, reviews the data, and determines the right programs across lifting, throwing, hitting, and recovery. Our <em>player development systems software</em> generates an individualized plan &mdash; strength programs, throwing programs, throwing schedule, and workload management &mdash; all built around <em>your goals</em>. Velocity. Command. Power. Speed. The fall season is hyper-focused on hitting them.</div>
   </div>
 </div>
 
@@ -308,7 +311,7 @@
   <div class="included-wrapper">
     <div>
       <div class="included-intro">
-        <p>An <em>elite professional staff across health and performance</em> determines your plan, builds your programs, and executes them all summer.</p>
+        <p>An <em>elite professional staff across health and performance</em> determines your plan, builds your programs, and executes them all fall.</p>
       </div>
       <div class="included-grid">
         <div class="included-item">
@@ -336,7 +339,7 @@
           <div class="included-icon"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0D0D0D" stroke-width="2" stroke-linecap="round"/></svg></div>
           <div>
             <div class="included-label">Daily Strength Training</div>
-            <div class="included-desc">Programmed S&amp;C at every location &mdash; speed, agility, power, and sport-specific strength development all summer</div>
+            <div class="included-desc">Programmed S&amp;C at every location &mdash; speed, agility, power, and sport-specific strength development all fall</div>
           </div>
         </div>
         <div class="included-item">
@@ -382,29 +385,36 @@
   <div class="section-title">Three Plans. One Commitment.</div>
   <div class="tiers">
     <div class="tier">
-      <div class="tier-name">Foundation</div>
-      <div class="tier-access">3 Days per Week (total)<br>Single Discipline (Hit or Pitch)</div>
-      <div class="tier-price">$500<span>/mo</span></div>
-      <div class="tier-total">$1,500 total commitment</div>
-      <div class="tier-pif">Pay in full: $1,350</div>
-    </div>
-    <div class="tier featured">
-      <div class="tier-name">Unlimited</div>
-      <div class="tier-access">Unlimited Days<br>Single Discipline (Hit or Pitch)</div>
-      <div class="tier-price">$600<span>/mo</span></div>
-      <div class="tier-total">$1,800 total commitment</div>
-      <div class="tier-pif">Pay in full: $1,620</div>
+      <div class="tier-name">Access</div>
+      <div class="tier-access">1 Day per Week<br>Single Discipline (Hit or Pitch)</div>
+      <div class="tier-price">$125<span>/mo</span></div>
+      <div class="tier-total">$625 total commitment</div>
+      <div class="tier-pif">Pay in full: $563</div>
     </div>
     <div class="tier">
-      <div class="tier-name">Two-Way</div>
+      <div class="tier-name">Premier</div>
+      <div class="tier-access">2 Days per Week<br>Single Discipline (Hit or Pitch)</div>
+      <div class="tier-price">$350<span>/mo</span></div>
+      <div class="tier-total">$1,750 total commitment</div>
+      <div class="tier-pif">Pay in full: $1,575</div>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Elite</div>
+      <div class="tier-access">Unlimited Days<br>Single Discipline (Hit or Pitch)</div>
+      <div class="tier-price">$500<span>/mo</span></div>
+      <div class="tier-total">$2,500 total commitment</div>
+      <div class="tier-pif">Pay in full: $2,250</div>
+    </div>
+    <div class="tier featured">
+      <div class="tier-name">Ultimate</div>
       <div class="tier-access">Unlimited Days<br>Pitching + Hitting</div>
       <div class="tier-price">$650<span>/mo</span></div>
-      <div class="tier-total">$1,950 total commitment</div>
-      <div class="tier-pif">Pay in full: $1,755</div>
+      <div class="tier-total">$3,250 total commitment</div>
+      <div class="tier-pif">Pay in full: $2,925</div>
     </div>
   </div>
   <div class="no-lessons">
-    <p><strong>No lesson packages are sold during the summer.</strong> These three plans are the only enrollment options. Every athlete gets an individualized development plan built into their membership.</p>
+    <p><strong>No lesson packages are sold during the fall.</strong> These three plans are the only enrollment options. Every athlete gets an individualized development plan built into their membership.</p>
   </div>
 </div>
 
@@ -421,13 +431,13 @@
       <div class="discount-text">Refer athletes to any location and earn:</div>
       <ul class="referral-tiers">
         <li><strong>1 referral</strong> &mdash; Free DEN &times; FCS shirt</li>
-        <li><strong>2 referrals</strong> &mdash; 2 private lessons (post-summer)</li>
+        <li><strong>2 referrals</strong> &mdash; 2 private lessons (post-fall)</li>
         <li><strong>3 referrals</strong> &mdash; $100 off/mo or $300 credit</li>
       </ul>
     </div>
     <div class="discount-card">
       <div class="discount-label">Pay in Full</div>
-      <div class="discount-text">Commit upfront and save <strong>10% off the total</strong> three-month cost. Applied at enrollment.</div>
+      <div class="discount-text">Commit upfront and save <strong>10% off the total</strong> five-month cost. Applied at enrollment.</div>
     </div>
   </div>
 </div>
@@ -450,12 +460,12 @@
     </div>
     <div class="step">
       <div class="step-text">Intake &amp; go to work</div>
-      <div class="step-detail">Complete your intake survey. Staff sit-down. Your plan is built. 3 months to get better.</div>
+      <div class="step-detail">Complete your intake survey. Staff sit-down. Your plan is built. 5 months to get better.</div>
     </div>
   </div>
   <div class="commitment">
-    <div class="commitment-title">3-Month Commitment Required</div>
-    <div class="commitment-text">All enrollment is a binding commitment for June, July, and August. No refunds, no pauses, no prorations. Your commitment allows us to plan staffing, programming, and evaluations across all three locations. Spots are limited and non-transferable.</div>
+    <div class="commitment-title">5-Month Commitment Required</div>
+    <div class="commitment-text">All enrollment is a binding commitment for August, September, October, November, and December. No refunds, no pauses, no prorations. Your commitment allows us to plan staffing, programming, and evaluations across all three locations. Spots are limited and non-transferable.</div>
   </div>
 </div>
 
