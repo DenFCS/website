@@ -162,6 +162,12 @@
   .tier-price span { font-size: 16px; font-weight: 400; color: var(--text-muted); }
   .tier-total { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 13px; color: var(--text-muted); margin-top: 4px; }
   .tier-pif { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 12px; color: var(--gold); margin-top: 8px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.8; }
+  .tier-subtitle { font-family: 'Barlow', sans-serif; font-weight: 400; font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; min-height: 32px; }
+  .tier-note { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 12px; color: var(--gold); margin-top: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; }
+  .tier-includes-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 1.5px; color: var(--text); text-transform: uppercase; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); text-align: left; }
+  .tier-includes { margin-top: 10px; padding: 0; list-style: none; text-align: left; }
+  .tier-includes li { font-family: 'Barlow', sans-serif; font-weight: 400; font-size: 12px; color: var(--text-muted); line-height: 1.5; padding: 4px 0 4px 14px; position: relative; }
+  .tier-includes li::before { content: '\2014'; position: absolute; left: 0; top: 4px; color: var(--gold); }
   .no-lessons { text-align: center; padding: 12px 20px; background: rgba(200,168,78,0.05); border: 1px dashed rgba(200,168,78,0.3); margin-top: 16px; }
   .no-lessons p { font-family: 'Barlow', sans-serif; font-weight: 400; font-size: 12px; color: var(--text-muted); letter-spacing: 0.5px; }
   .no-lessons strong { color: var(--gold); font-weight: 600; }
@@ -385,36 +391,70 @@
   <div class="section-title">Three Plans. One Commitment.</div>
   <div class="tiers">
     <div class="tier">
-      <div class="tier-name">Access</div>
-      <div class="tier-access">1 Day per Week<br>Single Discipline (Hit or Pitch)</div>
+      <div class="tier-name">Tier 01 &mdash; Access</div>
+      <div class="tier-subtitle">The required base &mdash; every athlete needs this or higher.</div>
       <div class="tier-price">$125<span>/mo</span></div>
+      <div class="tier-note">Required to book lessons</div>
       <div class="tier-total">$625 total commitment</div>
       <div class="tier-pif">Pay in full: $563</div>
-    </div>
-    <div class="tier">
-      <div class="tier-name">Premier</div>
-      <div class="tier-access">2 Days per Week<br>Single Discipline (Hit or Pitch)</div>
-      <div class="tier-price">$350<span>/mo</span></div>
-      <div class="tier-total">$1,750 total commitment</div>
-      <div class="tier-pif">Pay in full: $1,575</div>
-    </div>
-    <div class="tier">
-      <div class="tier-name">Elite</div>
-      <div class="tier-access">Unlimited Days<br>Single Discipline (Hit or Pitch)</div>
-      <div class="tier-price">$500<span>/mo</span></div>
-      <div class="tier-total">$2,500 total commitment</div>
-      <div class="tier-pif">Pay in full: $2,250</div>
+      <div class="tier-includes-label">Includes</div>
+      <ul class="tier-includes">
+        <li>Facility workout access during lesson times</li>
+        <li>Recovery access during lesson times</li>
+        <li>Extra swings on lesson days</li>
+        <li>Discounted gloves, bats, and relacing</li>
+      </ul>
     </div>
     <div class="tier featured">
-      <div class="tier-name">Ultimate</div>
-      <div class="tier-access">Unlimited Days<br>Pitching + Hitting</div>
+      <div class="tier-name">Tier 02 &mdash; Training</div>
+      <div class="tier-subtitle">Full access, no lessons included.</div>
+      <div class="tier-price">$350<span>/mo</span></div>
+      <div class="tier-note">Lessons at $50 each</div>
+      <div class="tier-total">$1,750 total commitment</div>
+      <div class="tier-pif">Pay in full: $1,575</div>
+      <div class="tier-includes-label">Includes</div>
+      <ul class="tier-includes">
+        <li>Unlimited facility access</li>
+        <li>Unlimited physical therapy</li>
+        <li>Unlimited recovery services</li>
+        <li>Evaluation &amp; assessment &mdash; fee</li>
+        <li>S&amp;C, throwing, hitting &amp; velocity programming included with evaluation</li>
+        <li>First access to camps and events</li>
+      </ul>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Tier 03 &mdash; Elite</div>
+      <div class="tier-subtitle">Strong training package for serious development.</div>
+      <div class="tier-price">$500<span>/mo</span></div>
+      <div class="tier-note">4 lessons/mo included</div>
+      <div class="tier-total">$2,500 total commitment</div>
+      <div class="tier-pif">Pay in full: $2,250</div>
+      <div class="tier-includes-label">Everything in Training, plus</div>
+      <ul class="tier-includes">
+        <li>4 lessons per month &mdash; hitting or pitching</li>
+        <li>S&amp;C, throwing, hitting &amp; velocity programming included</li>
+        <li>Evaluation &amp; assessment included</li>
+        <li>Discounted lessons beyond the 4 included</li>
+        <li>Ask about lesson bundles</li>
+      </ul>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Tier 04 &mdash; Ultimate</div>
+      <div class="tier-subtitle">Top-tier, all-access membership.</div>
       <div class="tier-price">$650<span>/mo</span></div>
+      <div class="tier-note">8 lessons/mo included</div>
       <div class="tier-total">$3,250 total commitment</div>
       <div class="tier-pif">Pay in full: $2,925</div>
+      <div class="tier-includes-label">Everything in Elite, plus</div>
+      <ul class="tier-includes">
+        <li>8 lessons per month &mdash; hitting or pitching</li>
+        <li>Recruiting guidance &mdash; Trackman/Rapsodo data and video</li>
+        <li>Deepest discounts on gear and add-ons</li>
+      </ul>
     </div>
   </div>
   <div class="no-lessons">
-    <p><strong>No lesson packages are sold during the fall.</strong> These three plans are the only enrollment options. Every athlete gets an individualized development plan built into their membership.</p>
+    <p><strong>Access is required for any facility use.</strong> Lessons can be booked individually on Training ($50 each) or come included on Elite (4/mo) and Ultimate (8/mo). Every athlete above Access gets an individualized development plan built into their membership.</p>
   </div>
 </div>
 
