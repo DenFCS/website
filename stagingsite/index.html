@@ -715,15 +715,19 @@
 
     .alumni-tabs {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       border-top: 1px solid var(--n-200);
       border-bottom: 1px solid var(--n-200);
       margin: 0 auto;
       max-width: 1200px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
     }
 
     .alumni-tab {
-      flex: 1;
+      flex: 0 0 160px;
       padding: 18px 12px;
       background: transparent;
       border: none;
@@ -2761,6 +2765,36 @@
         <span class="alumni-tab-name">Tyler Beede</span>
         <span class="alumni-tab-team">MLB · RHP</span>
       </button>
+      <button class="alumni-tab" data-p="5">
+        <span class="alumni-tab-avatar"><img loading="lazy" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>" alt="Add Name"></span>
+        <span class="alumni-tab-name">Add Name</span>
+        <span class="alumni-tab-team">TBD · POS</span>
+      </button>
+      <button class="alumni-tab" data-p="6">
+        <span class="alumni-tab-avatar"><img loading="lazy" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>" alt="Add Name"></span>
+        <span class="alumni-tab-name">Add Name</span>
+        <span class="alumni-tab-team">TBD · POS</span>
+      </button>
+      <button class="alumni-tab" data-p="7">
+        <span class="alumni-tab-avatar"><img loading="lazy" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>" alt="Add Name"></span>
+        <span class="alumni-tab-name">Add Name</span>
+        <span class="alumni-tab-team">TBD · POS</span>
+      </button>
+      <button class="alumni-tab" data-p="8">
+        <span class="alumni-tab-avatar"><img loading="lazy" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>" alt="Add Name"></span>
+        <span class="alumni-tab-name">Add Name</span>
+        <span class="alumni-tab-team">TBD · POS</span>
+      </button>
+      <button class="alumni-tab" data-p="9">
+        <span class="alumni-tab-avatar"><img loading="lazy" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>" alt="Add Name"></span>
+        <span class="alumni-tab-name">Add Name</span>
+        <span class="alumni-tab-team">TBD · POS</span>
+      </button>
+      <button class="alumni-tab" data-p="10">
+        <span class="alumni-tab-avatar"><img loading="lazy" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>" alt="Add Name"></span>
+        <span class="alumni-tab-name">Add Name</span>
+        <span class="alumni-tab-team">TBD · POS</span>
+      </button>
     </div>
 
     <div class="alumni-panel" id="alumni-panel" style="opacity: 1;">
@@ -3575,6 +3609,109 @@
         denLabel: "Live bullpen \u00b7 The Den",
         mlbYoutubeId: "Yif07DSM--U",
         mlbLabel: "8 shutout innings vs NYM \u00b7 MLB"
+      }
+    ,
+      {
+        name: "Add Name",
+        initials: "AN",
+        team: "Add Team",
+        role: "Add Position",
+        num: "\u2014",
+        teamRole: "Add Team \u00b7 Add Position",
+        portraitImg: "",
+        headshotImg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>",
+        quote: "Add a short quote here.",
+        bio: "Add this athlete\u2019s bio here \u2014 background, school, draft info, and career highlights.",
+        stats: [{ v: "\u2014", l: "Add Stat" }, { v: "\u2014", l: "Add Stat" }],
+        denVideoSrc: null,
+        denLabel: "At The Den",
+        mlbYoutubeId: null,
+        mlbLabel: "MLB"
+      },
+      {
+        name: "Add Name",
+        initials: "AN",
+        team: "Add Team",
+        role: "Add Position",
+        num: "\u2014",
+        teamRole: "Add Team \u00b7 Add Position",
+        portraitImg: "",
+        headshotImg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>",
+        quote: "Add a short quote here.",
+        bio: "Add this athlete\u2019s bio here \u2014 background, school, draft info, and career highlights.",
+        stats: [{ v: "\u2014", l: "Add Stat" }, { v: "\u2014", l: "Add Stat" }],
+        denVideoSrc: null,
+        denLabel: "At The Den",
+        mlbYoutubeId: null,
+        mlbLabel: "MLB"
+      },
+      {
+        name: "Add Name",
+        initials: "AN",
+        team: "Add Team",
+        role: "Add Position",
+        num: "\u2014",
+        teamRole: "Add Team \u00b7 Add Position",
+        portraitImg: "",
+        headshotImg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>",
+        quote: "Add a short quote here.",
+        bio: "Add this athlete\u2019s bio here \u2014 background, school, draft info, and career highlights.",
+        stats: [{ v: "\u2014", l: "Add Stat" }, { v: "\u2014", l: "Add Stat" }],
+        denVideoSrc: null,
+        denLabel: "At The Den",
+        mlbYoutubeId: null,
+        mlbLabel: "MLB"
+      },
+      {
+        name: "Add Name",
+        initials: "AN",
+        team: "Add Team",
+        role: "Add Position",
+        num: "\u2014",
+        teamRole: "Add Team \u00b7 Add Position",
+        portraitImg: "",
+        headshotImg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>",
+        quote: "Add a short quote here.",
+        bio: "Add this athlete\u2019s bio here \u2014 background, school, draft info, and career highlights.",
+        stats: [{ v: "\u2014", l: "Add Stat" }, { v: "\u2014", l: "Add Stat" }],
+        denVideoSrc: null,
+        denLabel: "At The Den",
+        mlbYoutubeId: null,
+        mlbLabel: "MLB"
+      },
+      {
+        name: "Add Name",
+        initials: "AN",
+        team: "Add Team",
+        role: "Add Position",
+        num: "\u2014",
+        teamRole: "Add Team \u00b7 Add Position",
+        portraitImg: "",
+        headshotImg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>",
+        quote: "Add a short quote here.",
+        bio: "Add this athlete\u2019s bio here \u2014 background, school, draft info, and career highlights.",
+        stats: [{ v: "\u2014", l: "Add Stat" }, { v: "\u2014", l: "Add Stat" }],
+        denVideoSrc: null,
+        denLabel: "At The Den",
+        mlbYoutubeId: null,
+        mlbLabel: "MLB"
+      },
+      {
+        name: "Add Name",
+        initials: "AN",
+        team: "Add Team",
+        role: "Add Position",
+        num: "\u2014",
+        teamRole: "Add Team \u00b7 Add Position",
+        portraitImg: "",
+        headshotImg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='22' fill='%23e5e2da'/><circle cx='22' cy='17' r='7' fill='%23a8a296'/><path d='M8 38c0-8 6-13 14-13s14 5 14 13' fill='%23a8a296'/></svg>",
+        quote: "Add a short quote here.",
+        bio: "Add this athlete\u2019s bio here \u2014 background, school, draft info, and career highlights.",
+        stats: [{ v: "\u2014", l: "Add Stat" }, { v: "\u2014", l: "Add Stat" }],
+        denVideoSrc: null,
+        denLabel: "At The Den",
+        mlbYoutubeId: null,
+        mlbLabel: "MLB"
       }
     ];
 
