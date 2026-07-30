@@ -24,12 +24,12 @@
       previewUrl: '/stagingsite/',
     },
     {
-      id: 'summerprogram',
-      label: 'Summer Program (/summerprogram/)',
-      stagingSrc: '/stagingsite/summerprogram/index.html',
-      stagingPath: 'stagingsite/summerprogram/index.html',
-      prodPath: 'summerprogram/index.html',
-      previewUrl: '/stagingsite/summerprogram/',
+      id: 'fallprogram',
+      label: 'Fall Program (/fallprogram/)',
+      stagingSrc: '/stagingsite/fallprogram/index.html',
+      stagingPath: 'stagingsite/fallprogram/index.html',
+      prodPath: 'fallprogram/index.html',
+      previewUrl: '/stagingsite/fallprogram/',
     },
     {
       id: 'scholarships',
