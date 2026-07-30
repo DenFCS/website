@@ -1175,13 +1175,17 @@
     }
 
     .tier-grid {
-      max-width: 1100px;
+      max-width: 1300px;
       margin: 0 auto;
       padding: 0 var(--sp-xl);
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 18px;
       align-items: stretch;
+    }
+
+    @media (max-width: 1100px) {
+      .tier-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 900px) {
@@ -3106,78 +3110,103 @@
     <div class="tier-grid">
       <div class="tier">
         <div class="tier-tag">Tier 01</div>
-        <div class="tier-name">Foundation</div>
-        <div class="tier-sub">Build the base.</div>
+        <div class="tier-name">Access</div>
+        <div class="tier-sub">The required base — every athlete needs this or higher.</div>
         <div class="tier-price-row">
-          <div class="tier-price">$500</div>
+          <div class="tier-price">$125</div>
           <div class="tier-per">/mo</div>
         </div>
-        <div class="tier-note">3 Month Commitment</div>
+        <div class="tier-note">Required to book lessons</div>
         <div class="tier-track">
-          <button class="tier-track-btn active" data-tier="foundation" data-track="pitching">Pitching</button>
-          <button class="tier-track-btn" data-tier="foundation" data-track="hitting">Hitting</button>
+          <button class="tier-track-btn active" data-tier="access" data-track="pitching">Pitching</button>
+          <button class="tier-track-btn" data-tier="access" data-track="hitting">Hitting</button>
         </div>
         <div class="tier-features">
           <div class="tier-features-label">Includes</div>
           <ul class="tier-feature-list">
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>3 days per week access</span></li>
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>All facilities — cages, bullpen, weight room</span></li>
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Pick one discipline: pitching or hitting</span></li>
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Starting evaluation and baseline metrics</span></li>
+            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Facility workout access during lesson times</span></li>
+            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Recovery access during lesson times</span></li>
+            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Extra swings on lesson days</span></li>
+            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Discounted gloves, bats, and relacing</span></li>
           </ul>
         </div>
-        <a href="https://team.lionsdenhtx.com/a/packages/?packageTag=1.%20Memberships" target="_blank" rel="noopener noreferrer" class="btn btn-secondary tier-cta">Start Foundation — $500/mo</a>
+        <a href="https://team.lionsdenhtx.com/a/packages/?packageTag=1.%20Memberships" target="_blank" rel="noopener noreferrer" class="btn btn-secondary tier-cta">Start Access — $125/mo</a>
+      </div>
+
+      <div class="tier">
+        <div class="tier-tag">Tier 02</div>
+        <div class="tier-name">Training</div>
+        <div class="tier-sub">Full access, no lessons included.</div>
+        <div class="tier-price-row">
+          <div class="tier-price">$350</div>
+          <div class="tier-per">/mo</div>
+        </div>
+        <div class="tier-note">Lessons at $50 each</div>
+        <div class="tier-track">
+          <button class="tier-track-btn active" data-tier="training" data-track="pitching">Pitching</button>
+          <button class="tier-track-btn" data-tier="training" data-track="hitting">Hitting</button>
+        </div>
+        <div class="tier-features">
+          <div class="tier-features-label">Everything In Access, Plus</div>
+          <ul class="tier-feature-list">
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Unlimited facility access</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Unlimited physical therapy</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Unlimited recovery services</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Evaluation &amp; assessment — fee</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>First access to camps and events</span></li>
+          </ul>
+        </div>
+        <a href="https://team.lionsdenhtx.com/a/packages/?packageTag=1.%20Memberships" target="_blank" rel="noopener noreferrer" class="btn btn-secondary tier-cta">Start Training — $350/mo</a>
       </div>
 
       <div class="tier featured">
         <div class="tier-badge">Most Popular</div>
-        <div class="tier-tag">Tier 02</div>
-        <div class="tier-name">Unlimited</div>
-        <div class="tier-sub">Go every day if you want.</div>
+        <div class="tier-tag">Tier 03</div>
+        <div class="tier-name">Elite</div>
+        <div class="tier-sub">Strong training package for serious development.</div>
         <div class="tier-price-row">
-          <div class="tier-price">$600</div>
+          <div class="tier-price">$500</div>
           <div class="tier-per">/mo</div>
         </div>
-        <div class="tier-note">+$100 For Unlimited Access</div>
+        <div class="tier-note">4 lessons/mo included</div>
         <div class="tier-track">
-          <button class="tier-track-btn active" data-tier="unlimited" data-track="pitching">Pitching</button>
-          <button class="tier-track-btn" data-tier="unlimited" data-track="hitting">Hitting</button>
+          <button class="tier-track-btn active" data-tier="elite" data-track="pitching">Pitching</button>
+          <button class="tier-track-btn" data-tier="elite" data-track="hitting">Hitting</button>
         </div>
         <div class="tier-features">
-          <div class="tier-features-label">Everything In Foundation, Plus</div>
+          <div class="tier-features-label">Everything In Training, Plus</div>
           <ul class="tier-feature-list">
-            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Unlimited visits — open floor access</span></li>
-            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Priority scheduling on coached sessions</span></li>
-            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Monthly progress check-in with staff</span></li>
-            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Recovery and arm care protocols</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>4 lessons per month — hitting or pitching</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>S&amp;C, throwing, hitting &amp; velocity programming included</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Evaluation &amp; assessment included</span></li>
+            <li class="tier-feature check"><span class="tier-feature-dot"></span><span>Discounted lessons beyond the 4 included</span></li>
           </ul>
         </div>
-        <a href="https://team.lionsdenhtx.com/a/packages/?packageTag=1.%20Memberships" target="_blank" rel="noopener noreferrer" class="btn btn-primary tier-cta">Start Unlimited — $600/mo</a>
+        <a href="https://team.lionsdenhtx.com/a/packages/?packageTag=1.%20Memberships" target="_blank" rel="noopener noreferrer" class="btn btn-primary tier-cta">Start Elite — $500/mo</a>
       </div>
 
       <div class="tier two-way">
-        <div class="tier-tag">Tier 03</div>
-        <div class="tier-name">Two-Way</div>
-        <div class="tier-sub"><span>Pitch </span><em>and</em><span> hit. No compromise.</span></div>
+        <div class="tier-tag">Tier 04</div>
+        <div class="tier-name">Ultimate</div>
+        <div class="tier-sub"><span>Top-tier, </span><em>all-access</em><span> membership.</span></div>
         <div class="tier-price-row">
           <div class="tier-price">$650</div>
           <div class="tier-per">/mo</div>
         </div>
-        <div class="tier-note">+$50 For Both Disciplines</div>
+        <div class="tier-note">8 lessons/mo included</div>
         <div class="tier-two-way-badge">
           <span class="tier-two-way-dot"></span>
           <span class="tier-two-way-text">Pitching + Hitting, Unlimited</span>
         </div>
         <div class="tier-features">
-          <div class="tier-features-label">Everything In Unlimited, Plus</div>
+          <div class="tier-features-label">Everything In Elite, Plus</div>
           <ul class="tier-feature-list">
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Unlimited pitching and hitting</span></li>
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Dual-discipline workload management</span></li>
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Two-way recovery programming</span></li>
-            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Dedicated two-way pathway coaching</span></li>
+            <li class="tier-feature"><span class="tier-feature-dot"></span><span>8 lessons per month — hitting or pitching</span></li>
+            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Recruiting guidance — Trackman/Rapsodo data and video</span></li>
+            <li class="tier-feature"><span class="tier-feature-dot"></span><span>Deepest discounts on gear and add-ons</span></li>
           </ul>
         </div>
-        <a href="https://team.lionsdenhtx.com/a/packages/?packageTag=1.%20Memberships" target="_blank" rel="noopener noreferrer" class="btn btn-secondary tier-cta">Start Two-Way — $650/mo</a>
+        <a href="https://team.lionsdenhtx.com/a/packages/?packageTag=1.%20Memberships" target="_blank" rel="noopener noreferrer" class="btn btn-secondary tier-cta">Start Ultimate — $650/mo</a>
       </div>
     </div>
 
