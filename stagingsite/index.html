@@ -3626,7 +3626,9 @@
         denVideoSrc: "weiss-den.mp4",
         denLabel: "Bullpen \u00b7 The Den",
         mlbYoutubeId: null,
-        mlbLabel: "MLB Debut \u00b7 March 2026"
+        mlbVideoSrc: "https://mlb-cuts-diamond.mlb.com/FORGE/2026/2026-04/16/9dde882a-726ad2cb-65205fae-csvm-diamondgcp-asset_1280x720_59_4000K.mp4",
+        mlbThumb: "https://img.mlbstatic.com/mlb-images/image/upload/ar_16:9,g_auto,q_auto:good,w_1536,c_fill,f_jpg/mlb/hqvj17jqywond5e8fqhy",
+        mlbLabel: "Fans Julien \u00b7 1st Inning \u00b7 4/16/2026"
       },
       {
         name: "Add Name",
@@ -3777,6 +3779,15 @@
           mlbTileHtml =
             '<button class="alumni-video has-media" data-kind="youtube" data-id="' + p.mlbYoutubeId + '" aria-label="Play MLB video">' +
               '<img class="alumni-video-thumb" src="' + thumb + '" alt="" loading="lazy" />' +
+              '<div class="alumni-video-play"><div class="alumni-video-play-btn"><div class="alumni-video-play-icon"></div></div></div>' +
+              '<div class="alumni-video-tag">MLB</div>' +
+              '<div class="alumni-video-label">' + p.mlbLabel + '</div>' +
+            '</button>';
+        } else if (p.mlbVideoSrc) {
+          const thumbImg = p.mlbThumb ? '<img class="alumni-video-thumb" src="' + p.mlbThumb + '" alt="" loading="lazy" />' : '<video class="alumni-video-thumb" muted playsinline preload="metadata"><source src="' + p.mlbVideoSrc + '#t=0.5" type="video/mp4"></video>';
+          mlbTileHtml =
+            '<button class="alumni-video has-media" data-kind="video" data-src="' + p.mlbVideoSrc + '" aria-label="Play MLB video">' +
+              thumbImg +
               '<div class="alumni-video-play"><div class="alumni-video-play-btn"><div class="alumni-video-play-icon"></div></div></div>' +
               '<div class="alumni-video-tag">MLB</div>' +
               '<div class="alumni-video-label">' + p.mlbLabel + '</div>' +
