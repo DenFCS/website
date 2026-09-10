@@ -69,6 +69,10 @@
     .cta-row { flex-direction: column; align-items: stretch; }
   }
 
+  .video-section { text-align: center; }
+  .video-wrap { max-width: 380px; margin: 0 auto; border-radius: 6px; overflow: hidden; border: 1px solid #1E1E1E; background: var(--dark-card); }
+  .video-wrap video { width: 100%; display: block; }
+
   .cta { text-align: center; padding: 40px; background: radial-gradient(ellipse at 50% 100%, rgba(200,168,78,0.08) 0%, transparent 60%); }
   .cta-sub { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 13px; color: var(--text-muted); margin-top: 12px; }
   .cta-closer { font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 14px; color: var(--text); margin-top: 20px; letter-spacing: 0.5px; }
@@ -111,6 +115,17 @@
       <div class="step-title">Track &amp; Adjust</div>
       <div class="step-desc">Log your work in the PitchSafe app. Coaches review, give feedback, and adjust the plan as you progress.</div>
     </div>
+  </div>
+</div>
+
+<!-- PITCHSAFE DEMO -->
+<div class="section video-section">
+  <div class="section-title">See PitchSafe In Action</div>
+  <p class="section-intro">A quick look at how athletes log throws, track workload, and stay connected with their coach through the PitchSafe app.</p>
+  <div class="video-wrap">
+    <video controls playsinline preload="metadata">
+      <source src="/pitchsafe-demo.mp4" type="video/mp4">
+    </video>
   </div>
 </div>
 
