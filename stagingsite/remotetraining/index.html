@@ -79,6 +79,7 @@
   .testimonial-quote::before { content: '\201C'; color: var(--gold); font-family: Georgia, serif; }
   .testimonial-quote::after { content: '\201D'; color: var(--gold); font-family: Georgia, serif; }
   .testimonial-author { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
+  .testimonial-photo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: top center; border: 1px solid #2A2A2A; flex-shrink: 0; }
   .testimonial-name { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.5px; color: var(--gold); text-transform: uppercase; }
 
   .testimonial-role { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
@@ -205,22 +206,31 @@
     <div class="testimonial-card">
       <div class="testimonial-quote">Great atmosphere and staff. If you need a place to get you right, no better staff to do so.</div>
       <div class="testimonial-author">
-        <div class="testimonial-name">Sam Carlson</div>
-        <div class="testimonial-role">LAA Organization</div>
+        <img class="testimonial-photo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='20' fill='%23262626'/><circle cx='20' cy='15' r='7' fill='%23484848'/><path d='M6 36c0-8 6-13 14-13s14 5 14 13' fill='%23484848'/></svg>" alt="Sam Carlson">
+        <div>
+          <div class="testimonial-name">Sam Carlson</div>
+          <div class="testimonial-role">Phillies Organization</div>
+        </div>
       </div>
     </div>
     <div class="testimonial-card">
       <div class="testimonial-quote">Elite team. Very knowledgeable and excited to get back to work with them during the off-season.</div>
       <div class="testimonial-author">
-        <div class="testimonial-name">Christian Roa</div>
-        <div class="testimonial-role">Astros Organization</div>
+        <img class="testimonial-photo" src="/roa-card.jpg" alt="Christian Roa">
+        <div>
+          <div class="testimonial-name">Christian Roa</div>
+          <div class="testimonial-role">Astros Organization</div>
+        </div>
       </div>
     </div>
     <div class="testimonial-card">
       <div class="testimonial-quote">Denis believed in me when it would've been easy not to. He took a chance on me and helped me go from not throwing hard enough to sitting 97–99 in a single year. Now I'm knocking on the door of getting back to the big leagues with the Cubs. He gave me my belief back and reshaped my career at 31.</div>
       <div class="testimonial-author">
-        <div class="testimonial-name">Gabe Klobosits</div>
-        <div class="testimonial-role">Chicago Cubs Organization</div>
+        <img class="testimonial-photo" src="/gabe-card.jpg" alt="Gabe Klobosits">
+        <div>
+          <div class="testimonial-name">Gabe Klobosits</div>
+          <div class="testimonial-role">Chicago Cubs Organization</div>
+        </div>
       </div>
     </div>
   </div>
