@@ -73,6 +73,18 @@
   .video-wrap { max-width: 380px; margin: 0 auto; border-radius: 6px; overflow: hidden; border: 1px solid #1E1E1E; background: var(--dark-card); }
   .video-wrap video { width: 100%; display: block; }
 
+  .testimonial-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .testimonial-card { background: var(--dark-card); border: 1px solid #1E1E1E; padding: 24px; }
+  .testimonial-quote { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 15px; color: var(--text); line-height: 1.7; font-style: italic; }
+  .testimonial-quote::before { content: '\201C'; color: var(--gold); font-family: Georgia, serif; }
+  .testimonial-quote::after { content: '\201D'; color: var(--gold); font-family: Georgia, serif; }
+  .testimonial-author { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
+  .testimonial-name { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.5px; color: var(--gold); text-transform: uppercase; }
+
+  @media (min-width: 700px) {
+    .testimonial-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
   .cta { text-align: center; padding: 40px; background: radial-gradient(ellipse at 50% 100%, rgba(200,168,78,0.08) 0%, transparent 60%); }
   .cta-sub { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 13px; color: var(--text-muted); margin-top: 12px; }
   .cta-closer { font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 14px; color: var(--text); margin-top: 20px; letter-spacing: 0.5px; }
@@ -90,8 +102,7 @@
   <p class="tagline">Can&rsquo;t make it to one of our facilities? We build the same <strong>individualized development plan</strong> — throwing, hitting, strength, and recovery — delivered remotely and tracked through the <strong>PitchSafe app</strong>. Real coaches, real programming, wherever you are.</p>
   <div class="badge">Now Enrolling</div>
   <div class="cta-row">
-    <a href="https://team.thedenfcs.com" target="_blank" rel="noopener noreferrer" class="cta-button primary">Sign Up Now</a>
-    <a href="https://calendly.com/jrichey09/denfcs-fall-membership-consult-call" target="_blank" rel="noopener noreferrer" class="cta-button secondary">Book a Consult Call</a>
+    <a href="https://calendly.com/jrichey09/denfcs-fall-membership-consult-call" target="_blank" rel="noopener noreferrer" class="cta-button primary">Book a Consult Call to Sign Up</a>
   </div>
 </div>
 
@@ -185,12 +196,36 @@
   </div>
 </div>
 
+<!-- TESTIMONIALS -->
+<div class="section">
+  <div class="section-title">What Athletes Are Saying</div>
+  <div class="testimonial-grid">
+    <div class="testimonial-card">
+      <div class="testimonial-quote">Add a testimonial quote here from an athlete or parent about their experience with remote training.</div>
+      <div class="testimonial-author">
+        <div class="testimonial-name">Add Name</div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-quote">Add a testimonial quote here from an athlete or parent about their experience with remote training.</div>
+      <div class="testimonial-author">
+        <div class="testimonial-name">Add Name</div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-quote">Add a testimonial quote here from an athlete or parent about their experience with remote training.</div>
+      <div class="testimonial-author">
+        <div class="testimonial-name">Add Name</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="cta">
   <h2 style="font-family:'Oswald',sans-serif; font-weight:600; font-size:26px; letter-spacing:1px; color:var(--text); margin-bottom:12px;">Ready to Start Training?</h2>
   <p class="cta-sub" style="max-width:520px; margin-left:auto; margin-right:auto;">Interested? Email us or book a consult call today to learn more.</p>
   <div class="cta-row" style="margin-top:24px;">
-    <a href="https://team.thedenfcs.com" target="_blank" rel="noopener noreferrer" class="cta-button primary">Sign Up Now</a>
-    <a href="https://calendly.com/jrichey09/denfcs-fall-membership-consult-call" target="_blank" rel="noopener noreferrer" class="cta-button secondary">Book a Consult Call</a>
+    <a href="https://calendly.com/jrichey09/denfcs-fall-membership-consult-call" target="_blank" rel="noopener noreferrer" class="cta-button primary">Book a Consult Call to Sign Up</a>
   </div>
   <div class="cta-closer">No better place to be.</div>
 </div>
