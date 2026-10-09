@@ -1454,6 +1454,25 @@
     .quiz-note { font-family: var(--f-util); font-size: 11px; letter-spacing: 0.08em; color: var(--n-600); margin-top: var(--sp-md); text-transform: uppercase; }
     @media (max-width: 640px) { .quiz { padding: 24px 18px; } .quiz-title { font-size: 19px; } .quiz-q { font-size: 16px; } .quiz-result-name { font-size: 28px; } .quiz-ctas .btn { width: 100%; justify-content: center; } }
 
+
+    .quiz-modal { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.78); display: none; align-items: center; justify-content: center; padding: 16px; }
+    .quiz-modal.open { display: flex; }
+    .quiz-dialog { position: relative; width: 100%; max-width: 640px; max-height: calc(100vh - 32px); overflow-y: auto; margin: 0; }
+    .quiz-close { position: absolute; top: 10px; right: 12px; width: 36px; height: 36px; background: none; border: none; color: var(--n-700); font-size: 26px; line-height: 1; cursor: pointer; z-index: 2; }
+    .quiz-close:hover, .quiz-close:focus-visible { color: var(--gold-400); outline: none; }
+    .quiz-fab { position: fixed; right: 20px; bottom: 20px; z-index: 8000; display: inline-flex; align-items: center; gap: 8px; background: var(--gold-400); color: var(--n-0); border: none; border-radius: 999px; padding: 14px 20px; font-family: var(--f-util); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 24px rgba(0,0,0,0.5); transition: transform .2s ease, background .2s ease; }
+    .quiz-fab:hover, .quiz-fab:focus-visible { background: var(--gold-300); transform: translateY(-2px); outline: none; }
+    .quiz-fab[hidden] { display: none; }
+    .quiz-form { text-align: left; max-width: 420px; margin: 0 auto; display: grid; gap: 12px; }
+    .quiz-form label { font-family: var(--f-util); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--n-700); display: grid; gap: 6px; }
+    .quiz-form input[type=text], .quiz-form input[type=email] { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; text-transform: none; letter-spacing: 0; }
+    .quiz-form input:focus { border-color: var(--gold-400); outline: none; }
+    .quiz-form .hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+    .quiz-fine { font-family: var(--f-body); font-size: 12px; color: var(--n-600); line-height: 1.5; text-transform: none; letter-spacing: 0; }
+    .quiz-err { font-family: var(--f-body); font-size: 14px; color: #ff8a7a; min-height: 18px; text-transform: none; letter-spacing: 0; }
+    .quiz-stagewarn { background: #3a1410; border: 1px solid #ff8a7a; color: #ffb4a8; font-family: var(--f-util); font-size: 11px; letter-spacing: 0.05em; padding: 8px 10px; border-radius: 4px; margin-bottom: 14px; text-transform: none; }
+    @media (max-width: 640px) { .quiz-fab { right: 14px; bottom: 14px; padding: 12px 16px; } }
+
     .tier-fallback {
       max-width: 640px;
       margin: var(--sp-3xl) auto 0;
@@ -3402,14 +3421,11 @@
       </div>
     </div>
 
-    <div class="quiz" id="tier-quiz">
-      <div id="quiz-intro">
-        <div class="quiz-eyebrow">— Find Your Fit —</div>
-        <div class="quiz-title">Not Sure Where to Start?</div>
-        <p class="quiz-sub">Answer 5 quick questions and we'll point you to the membership that fits your athlete.</p>
-        <button type="button" class="btn btn-primary" id="quiz-start">Take the 1-Minute Quiz →</button>
-      </div>
-      <div id="quiz-body" hidden aria-live="polite"></div>
+    <div class="quiz" id="tier-quiz-card">
+      <div class="quiz-eyebrow">— Find Your Fit —</div>
+      <div class="quiz-title">Not Sure Where to Start?</div>
+      <p class="quiz-sub">Answer a few quick questions and we'll point you to the membership that fits your athlete.</p>
+      <button type="button" class="btn btn-primary" data-open-quiz>Take the 1-Minute Quiz →</button>
     </div>
 
     <div class="tier-fallback">
@@ -3674,6 +3690,15 @@
       </div>
     </div>
   </footer>
+
+  <button type="button" class="quiz-fab" id="quiz-fab" data-open-quiz hidden aria-haspopup="dialog">Find Your Fit</button>
+  <div class="quiz-modal" id="quiz-modal" role="dialog" aria-modal="true" aria-label="Find your membership fit" aria-hidden="true">
+    <div class="quiz quiz-dialog" id="tier-quiz">
+      <button type="button" class="quiz-close" id="quiz-close" aria-label="Close quiz">&times;</button>
+      <div id="quiz-body" aria-live="polite"></div>
+    </div>
+  </div>
+
 
   <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
     <button class="lightbox-close" id="lightbox-close" aria-label="Close video">×</button>
@@ -4039,9 +4064,13 @@
 
     /* ---------- Not-sure-where-to-start quiz logic ---------- */
     (function () {
-      var root = document.getElementById('tier-quiz'); if (!root) return;
-      var intro = document.getElementById('quiz-intro'), body = document.getElementById('quiz-body');
+      var modal = document.getElementById('quiz-modal'); if (!modal) return;
+      var body = document.getElementById('quiz-body'), fab = document.getElementById('quiz-fab'), closeBtn = document.getElementById('quiz-close');
       var CONSULT = 'https://calendly.com/jrichey09/30min', ACCOUNT = 'https://team.thedenfcs.com';
+      /* LEAD CAPTURE: paste your Web3Forms access key here (free at web3forms.com). Leave '' until connected. */
+      var LEAD_ACCESS_KEY = '';
+      var AUTO_OPEN_MS = 12000;
+      var IS_STAGING = location.pathname.indexOf('/stagingsite') === 0;
       var Q = [
         { k: 'who', q: 'Who is training?', o: [
           ['pitcher', 'A pitcher'], ['hitter', 'A hitter'], ['both', 'A two-way player', 'Pitches and hits'] ] },
@@ -4050,89 +4079,120 @@
           ['break', 'Away most of the year', 'But home for breaks or summer'],
           ['away', 'Out of town', 'We can’t get to a facility regularly'] ] },
         { k: 'lessons', q: 'How much one-on-one coaching do you want?', o: [
-          ['none', 'Mostly train on my own', 'Facility access, no regular lessons'],
-          ['some', 'An occasional lesson', 'Book one-offs when needed'],
+          ['none', 'Mostly train on my own'],
+          ['some', 'An occasional lesson'],
           ['four', 'About one lesson a week', 'Around 4 a month'],
           ['eight', 'Two or more a week', 'Around 8 a month'] ] },
-        { k: 'plan', q: 'What kind of plan do you want?', o: [
-          ['facility', 'Just access to train', 'I’ll bring my own plan'],
-          ['full', 'The full development plan', 'Evaluation, strength, throwing, hitting and velocity programming, plus PT and recovery access'] ] },
         { k: 'goal', q: 'What’s the main goal?', o: [
           ['develop', 'Build skills and get stronger'],
           ['compete', 'Compete at a higher level', 'Make a team, move up a level'],
-          ['recruit', 'Get recruited', 'Need data, video and guidance for college coaches'] ] }
+          ['recruit', 'Get recruited', 'Need data, video and guidance for college coaches'] ] },
+        { k: 'start', q: 'When are you hoping to start?', o: [
+          ['now', 'As soon as possible'],
+          ['soon', 'Within the next month or two'],
+          ['later', 'Just researching for now'] ] }
       ];
+      var LABEL = { who: { pitcher: 'Pitcher', hitter: 'Hitter', both: 'Two-way player' }, where: { near: 'Close to a facility', 'break': 'Away most of the year, home on breaks', away: 'Out of town' }, lessons: { none: 'Mostly trains on own', some: 'Occasional lesson', four: 'About 4 lessons/mo', eight: 'About 8 lessons/mo' }, goal: { develop: 'Build skills and strength', compete: 'Compete at a higher level', recruit: 'Get recruited' }, start: { now: 'ASAP', soon: 'Within 1-2 months', later: 'Just researching' } };
       var T = {
-        access: { n: 'Access', p: '$125', inc: ['Facility workout access during lesson days', 'Recovery access during lesson days', 'Extra swings on lesson days', 'Discounted gloves, bats and relacing'], note: 'Required to book lessons ($50 each).' },
         premier: { n: 'Premier', p: '$350', inc: ['Unlimited facility access', 'Unlimited physical therapy and recovery services', 'Evaluation and individualized development plan', 'S&C, throwing, hitting and velocity programming', 'First access to camps and events'], note: 'Lessons are $50 each.' },
         elite: { n: 'Elite', p: '$500', inc: ['Everything in Premier', '4 lessons a month included (hitting development or pitching)', 'Evaluation and assessment included', 'Discounted lessons beyond the 4 included'] },
         ultimate: { n: 'Ultimate', p: '$650', inc: ['Everything in Elite', '8 lessons a month included (hitting development or pitching)', 'Recruiting guidance with Trackman/Rapsodo data and video', 'Deepest discounts on gear and add-ons'] },
         remote: { n: 'Remote Training', p: '', inc: ['Online evaluation and a custom program', 'Throwing programming, arm care, strength and recovery', 'Video review and coach feedback', 'Regular check-ins with your coach', 'In-person access included'] }
       };
-      var order = ['access', 'premier', 'elite', 'ultimate'];
-      var a = {}, step = 0;
+      var order = ['premier', 'elite', 'ultimate'];
+      var a = {}, step = 0, contact = null, lastFocus = null;
       function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
       function pick() {
-        var t;
-        if (a.lessons === 'eight') t = 'ultimate';
-        else if (a.lessons === 'four') t = (a.goal === 'recruit') ? 'ultimate' : 'elite';
-        else if (a.plan === 'full') t = 'premier';
-        else t = 'access';
-        return t;
+        if (a.lessons === 'eight') return 'ultimate';
+        if (a.lessons === 'four') return a.goal === 'recruit' ? 'ultimate' : 'elite';
+        return 'premier';
       }
+      function remoteFit() { return a.where === 'away' || a.where === 'break'; }
+      function recName() { return remoteFit() ? 'Remote Training' : T[pick()].n; }
       function lessonWord() { return a.who === 'pitcher' ? 'pitching lessons' : a.who === 'hitter' ? 'hitting development sessions' : 'pitching and hitting lessons'; }
       function why(t) {
-        var bits = [];
-        if (t === 'ultimate') bits.push(a.lessons === 'eight' ? 'You want about 8 ' + lessonWord() + ' a month, which Ultimate includes' : 'You want regular ' + lessonWord() + ' and help getting recruited, and Ultimate adds recruiting guidance with Trackman/Rapsodo data and video');
-        if (t === 'elite') bits.push('You want about 4 ' + lessonWord() + ' a month, and Elite includes them along with the full development plan');
-        if (t === 'premier') bits.push('You want the full development plan with PT and recovery access, and you’d rather book lessons only when you need them');
-        if (t === 'access') bits.push('You want facility access to train on your own, with lessons available whenever you want one');
-        if (a.goal === 'compete' && (t === 'access' || t === 'premier')) bits.push('If you want more coaching as you push to the next level, Elite is the natural step up');
-        return bits.join('. ') + '.';
+        var x = '';
+        if (t === 'ultimate') x = a.lessons === 'eight' ? 'You want about 8 ' + lessonWord() + ' a month, which Ultimate includes, along with recruiting guidance' : 'You want regular ' + lessonWord() + ' and help getting recruited, and Ultimate adds recruiting guidance with Trackman/Rapsodo data and video';
+        if (t === 'elite') x = 'You want about 4 ' + lessonWord() + ' a month, and Elite includes them along with the full development plan';
+        if (t === 'premier') x = 'You get unlimited facility access, physical therapy and recovery, and a full individualized development plan' + (a.lessons === 'some' ? ', with lessons booked whenever you need one' : '');
+        return x + '.';
       }
-      function setProgress(n) { var el = body.querySelector('.quiz-progress > span'); if (el) el.style.width = n + '%'; }
+      function progress(n) { var el = body.querySelector('.quiz-progress > span'); if (el) el.style.width = n + '%'; }
       function render() {
-        if (step >= Q.length) return result();
+        if (step >= Q.length) return gate();
         var q = Q[step];
         var h = '<div class="quiz-progress"><span></span></div><div class="quiz-step">Question ' + (step + 1) + ' of ' + Q.length + '</div><div class="quiz-q">' + esc(q.q) + '</div><div class="quiz-opts">';
         q.o.forEach(function (o) { h += '<button type="button" class="quiz-opt" data-v="' + o[0] + '">' + esc(o[1]) + (o[2] ? '<small>' + esc(o[2]) + '</small>' : '') + '</button>'; });
         h += '</div>' + (step > 0 ? '<button type="button" class="quiz-back" id="quiz-back">← Back</button>' : '');
         body.innerHTML = h;
-        setTimeout(function () { setProgress(step / Q.length * 100); }, 10);
-        body.querySelectorAll('.quiz-opt').forEach(function (b) {
-          b.addEventListener('click', function () { a[q.k] = b.dataset.v; step++; render(); });
+        setTimeout(function () { progress(step / Q.length * 100); }, 10);
+        body.querySelectorAll('.quiz-opt').forEach(function (b) { b.addEventListener('click', function () { a[q.k] = b.dataset.v; step++; render(); }); });
+        var back = document.getElementById('quiz-back'); if (back) back.addEventListener('click', function () { step--; render(); });
+      }
+      function gate() {
+        if (contact || !LEAD_ACCESS_KEY) return result();
+        body.innerHTML = '<div class="quiz-progress"><span style="width:100%"></span></div><div class="quiz-eyebrow">— Almost There —</div><div class="quiz-title" style="font-size:20px">Where should we send your match?</div><p class="quiz-sub">Enter your name and email to see your recommended membership. A coach may follow up to help you get started.</p>' +
+          '<form class="quiz-form" id="quiz-form" novalidate><label>Full name<input type="text" name="name" autocomplete="name" placeholder="First and last name" required></label><label>Email<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label><input class="hp" type="text" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="quiz-err" id="quiz-err" role="alert"></div><button type="submit" class="btn btn-primary" id="quiz-submit">See My Match →</button><p class="quiz-fine">We’ll only use your info to follow up about training at The Den × FCS. No spam.</p></form><button type="button" class="quiz-back" id="quiz-back">← Back</button>';
+        document.getElementById('quiz-back').addEventListener('click', function () { step = Q.length - 1; render(); });
+        document.getElementById('quiz-form').addEventListener('submit', submit);
+      }
+      function submit(e) {
+        e.preventDefault();
+        var f = e.target, name = f.name.value.trim(), email = f.email.value.trim(), err = document.getElementById('quiz-err'), btn = document.getElementById('quiz-submit');
+        if (f.botcheck.value) return;
+        if (name.split(/\s+/).filter(Boolean).length < 2) { err.textContent = 'Please enter your first and last name.'; f.name.focus(); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { err.textContent = 'Please enter a valid email address.'; f.email.focus(); return; }
+        err.textContent = ''; btn.disabled = true; btn.textContent = 'Sending…';
+        var summary = Object.keys(LABEL).map(function (k) { return k + ': ' + (LABEL[k][a[k]] || a[k]); }).join('\n');
+        fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({
+          access_key: LEAD_ACCESS_KEY, subject: 'New membership quiz lead: ' + name, from_name: 'Den × FCS Website Quiz', name: name, email: email,
+          recommended: recName(), message: 'Recommended: ' + recName() + '\n\n' + summary
+        }) }).then(function (r) { return r.json(); }).then(function (d) {
+          if (!d.success) throw new Error('fail');
+          contact = { name: name, email: email }; result();
+        }).catch(function () {
+          err.textContent = 'Something went wrong sending that. Please try again, or book a consult call instead.'; btn.disabled = false; btn.textContent = 'See My Match →';
         });
-        var back = document.getElementById('quiz-back');
-        if (back) back.addEventListener('click', function () { step--; render(); });
       }
       function list(t) { return '<ul class="quiz-incl">' + t.inc.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>'; }
       function result() {
-        var remote = (a.where === 'away' || a.where === 'break');
-        var t = pick(), T1 = T[t], h = '';
-        if (remote) {
+        var t = pick(), T1 = T[t], h = '<div class="quiz-result-tag">' + (contact ? esc(contact.name.split(/\s+/)[0]) + ', your best fit' : 'Your best fit') + '</div>';
+        if (remoteFit()) {
           var R = T.remote;
-          h += '<div class="quiz-result-tag">Your best fit</div><div class="quiz-result-name">' + R.n + '</div>';
-          h += '<p class="quiz-why" style="margin-top:16px;">' + (a.where === 'away' ? 'Since you can’t get to a facility regularly, Remote Training gives you a custom program, video feedback and coach check-ins from anywhere.' : 'Since you’re away most of the year, Remote Training keeps your program going with video feedback and coach check-ins, and you can train in person when you’re home on break.') + '</p>';
-          h += list(R);
+          h += '<div class="quiz-result-name">' + R.n + '</div>';
+          h += '<p class="quiz-why" style="margin-top:16px;">' + (a.where === 'away' ? 'Since you can’t get to a facility regularly, Remote Training gives you a custom program, video feedback and coach check-ins from anywhere.' : 'Since you’re away most of the year, Remote Training keeps your program going with video feedback and coach check-ins, and you can train in person when you’re home on break.') + '</p>' + list(R);
           h += '<div class="quiz-ctas"><a class="btn btn-primary" href="/remotetraining/">See Remote Training →</a><a class="btn btn-secondary" href="' + CONSULT + '" target="_blank" rel="noopener noreferrer">Book a Free Consult Call</a></div>';
           h += '<p class="quiz-also"><strong>If you’re in Houston often:</strong> your answers point to ' + T1.n + ' (' + T1.p + '/mo) as the in-gym fit.</p>';
         } else {
-          h += '<div class="quiz-result-tag">Your best fit</div><div class="quiz-result-name">' + T1.n + '</div>';
-          h += '<div class="quiz-result-price">' + T1.p + ' <small>/ month · 3-month commitment</small></div>';
-          h += '<p class="quiz-why">' + esc(why(t)) + '</p>' + list(T1);
+          h += '<div class="quiz-result-name">' + T1.n + '</div><div class="quiz-result-price">' + T1.p + ' <small>/ month · 3-month commitment</small></div><p class="quiz-why">' + esc(why(t)) + '</p>' + list(T1);
           if (T1.note) h += '<p class="quiz-also" style="margin-top:-8px;margin-bottom:16px;">' + esc(T1.note) + '</p>';
           h += '<div class="quiz-ctas"><a class="btn btn-primary" href="' + ACCOUNT + '" target="_blank" rel="noopener noreferrer">Create Your Account →</a><a class="btn btn-secondary" href="' + CONSULT + '" target="_blank" rel="noopener noreferrer">Book a Free Consult Call</a></div>';
           var i = order.indexOf(t);
-          if (i < order.length - 1) h += '<p class="quiz-also"><strong>Want more?</strong> ' + T[order[i + 1]].n + ' (' + T[order[i + 1]].p + '/mo) adds ' + ({access:'unlimited facility access, PT, recovery and a full development plan', premier:'4 lessons a month', elite:'8 lessons a month and recruiting guidance'})[t] + '.</p>';
+          if (i < order.length - 1) h += '<p class="quiz-also"><strong>Want more?</strong> ' + T[order[i + 1]].n + ' (' + T[order[i + 1]].p + '/mo) adds ' + ({premier:'4 lessons a month',elite:'8 lessons a month and recruiting guidance'})[t] + '.</p>';
         }
         h += '<button type="button" class="quiz-back" id="quiz-retake">Retake the quiz</button><p class="quiz-note">Not sure? A free consult call will sort it out.</p>';
         body.innerHTML = h;
         document.getElementById('quiz-retake').addEventListener('click', function () { a = {}; step = 0; render(); });
       }
-      document.getElementById('quiz-start').addEventListener('click', function () {
-        intro.hidden = true; body.hidden = false; a = {}; step = 0; render();
-        root.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
+      function open() {
+        lastFocus = document.activeElement;
+        render();
+        if (IS_STAGING && !LEAD_ACCESS_KEY) body.insertAdjacentHTML('afterbegin', '<div class="quiz-stagewarn">Staging only: lead capture is NOT connected yet, so no emails are being collected. Do not deploy until connected.</div>');
+        modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; fab.hidden = true;
+        closeBtn.focus();
+        try { sessionStorage.setItem('quizSeen', '1'); } catch (e) {}
+      }
+      function close() {
+        modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; fab.hidden = false;
+        if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
+      }
+      document.querySelectorAll('[data-open-quiz]').forEach(function (b) { b.addEventListener('click', open); });
+      closeBtn.addEventListener('click', close);
+      modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+      fab.hidden = false;
+      var seen = false; try { seen = sessionStorage.getItem('quizSeen') === '1'; } catch (e) {}
+      if (!seen) setTimeout(function () { if (!modal.classList.contains('open')) open(); }, AUTO_OPEN_MS);
     })();
 
     const pins = document.querySelectorAll('.pin');
@@ -4381,7 +4441,8 @@
 
     
       <script src="/email-handler.js" defer=""></script>
-                    <!-- staging-banner-start -->
+                    
+<!-- staging-banner-start -->
   <script src="/stagingsite/banner.js" defer></script>
   <!-- staging-banner-end -->
 </body></html>
