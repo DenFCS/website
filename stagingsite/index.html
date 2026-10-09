@@ -1467,6 +1467,8 @@
     .quiz-form label { font-family: var(--f-util); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--n-700); display: grid; gap: 6px; }
     .quiz-form input[type=text], .quiz-form input[type=email] { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; text-transform: none; letter-spacing: 0; }
     .quiz-form input:focus { border-color: var(--gold-400); outline: none; }
+    .quiz-text { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; resize: vertical; text-transform: none; letter-spacing: 0; margin-bottom: 4px; }
+    .quiz-text:focus { border-color: var(--gold-400); outline: none; }
     .quiz-form .hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
     .quiz-fine { font-family: var(--f-body); font-size: 12px; color: var(--n-600); line-height: 1.5; text-transform: none; letter-spacing: 0; }
     .quiz-err { font-family: var(--f-body); font-size: 14px; color: #ff8a7a; min-height: 18px; text-transform: none; letter-spacing: 0; }
@@ -4072,27 +4074,21 @@
       var AUTO_OPEN_MS = 12000;
       var IS_STAGING = location.pathname.indexOf('/stagingsite') === 0;
       var Q = [
-        { k: 'who', q: 'Who is training?', o: [
-          ['pitcher', 'A pitcher'], ['hitter', 'A hitter'], ['both', 'A two-way player', 'Pitches and hits'] ] },
+        { k: 'role', q: 'Is this a parent or a player asking?', o: [
+          ['parent', 'Parent'], ['player', 'Player'] ] },
+        { k: 'pos', q: 'What position are you looking to train for?', o: [
+          ['pitching', 'Pitching'], ['hitting', 'Hitting'], ['both', 'Two-Way', 'Pitching and hitting'] ] },
+        { k: 'limit', q: 'What is the biggest limitation?', o: [
+          ['strength', 'Strength / Power'], ['velocity', 'Velocity'], ['mechanics', 'Mechanics'], ['mobility', 'Mobility'], ['nutrition', 'Nutrition', 'Weight loss or gain'] ] },
         { k: 'where', q: 'How close are you to a Den × FCS facility?', o: [
           ['near', 'Close by', 'We can come in regularly (Porter or West Houston)'],
-          ['break', 'Away most of the year', 'But home for breaks or summer'],
+          ['break', 'Away most of the year', 'But home for breaks'],
           ['away', 'Out of town', 'We can’t get to a facility regularly'] ] },
-        { k: 'lessons', q: 'How much one-on-one coaching do you want?', o: [
-          ['none', 'Mostly train on my own'],
-          ['some', 'An occasional lesson'],
-          ['four', 'About one lesson a week', 'Around 4 a month'],
-          ['eight', 'Two or more a week', 'Around 8 a month'] ] },
-        { k: 'goal', q: 'What’s the main goal?', o: [
-          ['develop', 'Build skills and get stronger'],
-          ['compete', 'Compete at a higher level', 'Make a team, move up a level'],
-          ['recruit', 'Get recruited', 'Need data, video and guidance for college coaches'] ] },
-        { k: 'start', q: 'When are you hoping to start?', o: [
-          ['now', 'As soon as possible'],
-          ['soon', 'Within the next month or two'],
-          ['later', 'Just researching for now'] ] }
+        { k: 'help', type: 'text', q: 'How can we help?', ph: 'Tell us a little about your goals (optional)' },
+        { k: 'consult', q: 'Would you be open to a free consultation call?', o: [
+          ['yes', 'Yes'], ['no', 'No'] ] }
       ];
-      var LABEL = { who: { pitcher: 'Pitcher', hitter: 'Hitter', both: 'Two-way player' }, where: { near: 'Close to a facility', 'break': 'Away most of the year, home on breaks', away: 'Out of town' }, lessons: { none: 'Mostly trains on own', some: 'Occasional lesson', four: 'About 4 lessons/mo', eight: 'About 8 lessons/mo' }, goal: { develop: 'Build skills and strength', compete: 'Compete at a higher level', recruit: 'Get recruited' }, start: { now: 'ASAP', soon: 'Within 1-2 months', later: 'Just researching' } };
+      var LABEL = { role: { parent: 'Parent', player: 'Player' }, pos: { pitching: 'Pitching', hitting: 'Hitting', both: 'Two-Way (pitching and hitting)' }, limit: { strength: 'Strength/Power', velocity: 'Velocity', mechanics: 'Mechanics', mobility: 'Mobility', nutrition: 'Nutrition (weight loss/gain)' }, where: { near: 'Close to a facility', 'break': 'Away most of the year, home for breaks', away: 'Out of town' }, help: null, consult: { yes: 'Yes', no: 'No' } };
       var T = {
         premier: { n: 'Premier', p: '$350', inc: ['Unlimited facility access', 'Unlimited physical therapy and recovery services', 'Evaluation and individualized development plan', 'S&C, throwing, hitting and velocity programming', 'First access to camps and events'], note: 'Lessons are $50 each.' },
         elite: { n: 'Elite', p: '$500', inc: ['Everything in Premier', '4 lessons a month included (hitting development or pitching)', 'Evaluation and assessment included', 'Discounted lessons beyond the 4 included'] },
@@ -4102,31 +4098,40 @@
       var order = ['premier', 'elite', 'ultimate'];
       var a = {}, step = 0, contact = null, lastFocus = null;
       function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+      function coaching() { return a.limit === 'velocity' || a.limit === 'mechanics'; }
       function pick() {
-        if (a.lessons === 'eight') return 'ultimate';
-        if (a.lessons === 'four') return a.goal === 'recruit' ? 'ultimate' : 'elite';
-        return 'premier';
+        if (!coaching()) return 'premier';
+        return a.pos === 'both' ? 'ultimate' : 'elite';
       }
-      function remoteFit() { return a.where === 'away' || a.where === 'break'; }
+      /* Remote is built for pitchers: never offered to hitting-only athletes */
+      function remoteFit() { return (a.where === 'away' || a.where === 'break') && a.pos !== 'hitting'; }
       function recName() { return remoteFit() ? 'Remote Training' : T[pick()].n; }
-      function lessonWord() { return a.who === 'pitcher' ? 'pitching lessons' : a.who === 'hitter' ? 'hitting development sessions' : 'pitching and hitting lessons'; }
+      function limitWord() { return { strength: 'strength and power', velocity: 'velocity', mechanics: 'mechanics', mobility: 'mobility', nutrition: 'nutrition and body composition' }[a.limit]; }
       function why(t) {
         var x = '';
-        if (t === 'ultimate') x = a.lessons === 'eight' ? 'You want about 8 ' + lessonWord() + ' a month, and Ultimate gives you everything in Elite with unlimited lessons, plus recruiting guidance' : 'You want regular ' + lessonWord() + ' and help getting recruited, and Ultimate gives you everything in Elite with unlimited lessons, plus recruiting guidance using Trackman/Rapsodo data and video';
-        if (t === 'elite') x = 'You want about 4 ' + lessonWord() + ' a month, and Elite includes them along with the full development plan';
-        if (t === 'premier') x = 'You get unlimited facility access, physical therapy and recovery, and a full individualized development plan' + (a.lessons === 'some' ? ', with lessons booked whenever you need one' : '');
+        if (t === 'premier') x = 'Since the biggest limitation is ' + limitWord() + ', Premier gives you unlimited facility access, S&C programming, physical therapy and recovery, and a full individualized development plan';
+        if (t === 'elite') x = 'Since the biggest limitation is ' + limitWord() + ', regular one-on-one coaching makes the difference, and Elite includes 4 lessons a month along with the full development plan';
+        if (t === 'ultimate') x = 'For a two-way player working on ' + limitWord() + ', regular coaching on both sides matters, and Ultimate gives you everything in Elite with unlimited lessons';
         return x + '.';
       }
       function progress(n) { var el = body.querySelector('.quiz-progress > span'); if (el) el.style.width = n + '%'; }
       function render() {
         if (step >= Q.length) return gate();
         var q = Q[step];
-        var h = '<div class="quiz-progress"><span></span></div><div class="quiz-step">Question ' + (step + 1) + ' of ' + Q.length + '</div><div class="quiz-q">' + esc(q.q) + '</div><div class="quiz-opts">';
-        q.o.forEach(function (o) { h += '<button type="button" class="quiz-opt" data-v="' + o[0] + '">' + esc(o[1]) + (o[2] ? '<small>' + esc(o[2]) + '</small>' : '') + '</button>'; });
-        h += '</div>' + (step > 0 ? '<button type="button" class="quiz-back" id="quiz-back">← Back</button>' : '');
+        var h = '<div class="quiz-progress"><span></span></div><div class="quiz-step">Question ' + (step + 1) + ' of ' + Q.length + '</div><div class="quiz-q">' + esc(q.q) + '</div>';
+        if (q.type === 'text') {
+          h += '<form class="quiz-form" id="quiz-textform" style="max-width:none"><textarea class="quiz-text" name="t" maxlength="400" rows="4" placeholder="' + esc(q.ph) + '"></textarea><button type="submit" class="btn btn-primary">Next →</button></form>';
+        } else {
+          h += '<div class="quiz-opts">';
+          q.o.forEach(function (o) { h += '<button type="button" class="quiz-opt" data-v="' + o[0] + '">' + esc(o[1]) + (o[2] ? '<small>' + esc(o[2]) + '</small>' : '') + '</button>'; });
+          h += '</div>';
+        }
+        h += (step > 0 ? '<button type="button" class="quiz-back" id="quiz-back">← Back</button>' : '');
         body.innerHTML = h;
         setTimeout(function () { progress(step / Q.length * 100); }, 10);
         body.querySelectorAll('.quiz-opt').forEach(function (b) { b.addEventListener('click', function () { a[q.k] = b.dataset.v; step++; render(); }); });
+        var tf = document.getElementById('quiz-textform');
+        if (tf) { if (a[q.k]) tf.t.value = a[q.k]; tf.addEventListener('submit', function (e) { e.preventDefault(); a[q.k] = tf.t.value.trim(); step++; render(); }); }
         var back = document.getElementById('quiz-back'); if (back) back.addEventListener('click', function () { step--; render(); });
       }
       function gate() {
@@ -4143,10 +4148,10 @@
         if (name.split(/\s+/).filter(Boolean).length < 2) { err.textContent = 'Please enter your first and last name.'; f.name.focus(); return; }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { err.textContent = 'Please enter a valid email address.'; f.email.focus(); return; }
         err.textContent = ''; btn.disabled = true; btn.textContent = 'Sending…';
-        var summary = Object.keys(LABEL).map(function (k) { return k + ': ' + (LABEL[k][a[k]] || a[k]); }).join('\n');
+        var summary = Object.keys(LABEL).map(function (k) { return (k === 'help') ? ('How can we help: ' + (a.help || '(left blank)')) : (k + ': ' + (LABEL[k][a[k]] || a[k])); }).join('\n');
         fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({
-          access_key: LEAD_ACCESS_KEY, subject: 'New membership quiz lead: ' + name, from_name: 'Den × FCS Website Quiz', name: name, email: email,
-          recommended: recName(), message: 'Name: ' + name + '\nEmail: ' + email + '\nRecommended: ' + recName() + '\n\n' + summary
+          access_key: LEAD_ACCESS_KEY, subject: 'New membership quiz lead: ' + name + (a.consult === 'yes' ? ' (wants a consult call)' : ''), from_name: 'Den × FCS Website Quiz', name: name, email: email,
+          recommended: recName(), message: 'Name: ' + name + '\nEmail: ' + email + '\nOpen to consult call: ' + (LABEL.consult[a.consult] || a.consult) + '\nRecommended: ' + recName() + '\n\n' + summary
         }) }).then(function (r) { return r.json(); }).then(function (d) {
           if (!d.success) throw new Error('fail');
           contact = { name: name, email: email }; result();
@@ -4156,21 +4161,25 @@
       }
       function list(t) { return '<ul class="quiz-incl">' + t.inc.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>'; }
       function result() {
-        var t = pick(), T1 = T[t], h = '<div class="quiz-result-tag">' + (contact ? esc(contact.name.split(/\s+/)[0]) + ', your best fit' : 'Your best fit') + '</div>';
+        var t = pick(), T1 = T[t], yes = a.consult === 'yes', h = '<div class="quiz-result-tag">' + (contact ? esc(contact.name.split(/\s+/)[0]) + ', your best fit' : 'Your best fit') + '</div>';
+        var consultBtn = function (primary) { return '<a class="btn ' + (primary ? 'btn-primary' : 'btn-secondary') + '" href="' + CONSULT + '" target="_blank" rel="noopener noreferrer">Book a Free Consult Call' + (primary ? ' →' : '') + '</a>'; };
         if (remoteFit()) {
           var R = T.remote;
           h += '<div class="quiz-result-name">' + R.n + '</div>';
           h += '<p class="quiz-why" style="margin-top:16px;">' + (a.where === 'away' ? 'Since you can’t get to a facility regularly, Remote Training gives you a custom program, video feedback and coach check-ins from anywhere.' : 'Since you’re away most of the year, Remote Training keeps your program going with video feedback and coach check-ins, and you can train in person when you’re home on break.') + '</p>' + list(R);
-          h += '<div class="quiz-ctas"><a class="btn btn-primary" href="/remotetraining/">See Remote Training →</a><a class="btn btn-secondary" href="' + CONSULT + '" target="_blank" rel="noopener noreferrer">Book a Free Consult Call</a></div>';
+          if (a.pos === 'both') h += '<p class="quiz-also" style="margin-top:-8px;margin-bottom:16px;">Remote Training is built for pitchers, so the hitting side of your training is done in person at The Den.</p>';
+          h += '<div class="quiz-ctas"><a class="btn btn-primary" href="/remotetraining/">See Remote Training →</a>' + (yes ? consultBtn(false) : '') + '</div>';
           h += '<p class="quiz-also"><strong>If you’re in Houston often:</strong> your answers point to ' + T1.n + ' (' + T1.p + '/mo) as the in-gym fit.</p>';
         } else {
           h += '<div class="quiz-result-name">' + T1.n + '</div><div class="quiz-result-price">' + T1.p + ' <small>/ month · 3-month commitment</small></div><p class="quiz-why">' + esc(why(t)) + '</p>' + list(T1);
           if (T1.note) h += '<p class="quiz-also" style="margin-top:-8px;margin-bottom:16px;">' + esc(T1.note) + '</p>';
-          h += '<div class="quiz-ctas"><a class="btn btn-primary" href="' + ACCOUNT + '" target="_blank" rel="noopener noreferrer">Create Your Account →</a><a class="btn btn-secondary" href="' + CONSULT + '" target="_blank" rel="noopener noreferrer">Book a Free Consult Call</a></div>';
+          if (a.pos === 'hitting' && (a.where === 'away' || a.where === 'break')) h += '<p class="quiz-also" style="margin-top:-8px;margin-bottom:16px;">Hitting training is done in person at The Den, so we’d plan your sessions around the times you’re home.</p>';
+          var acct = '<a class="btn ' + (yes ? 'btn-secondary' : 'btn-primary') + '" href="' + ACCOUNT + '" target="_blank" rel="noopener noreferrer">Create Your Account' + (yes ? '' : ' →') + '</a>';
+          h += '<div class="quiz-ctas">' + (yes ? consultBtn(true) + acct : acct) + '</div>';
           var i = order.indexOf(t);
           if (i < order.length - 1) h += '<p class="quiz-also"><strong>Want more?</strong> ' + T[order[i + 1]].n + ' (' + T[order[i + 1]].p + '/mo) adds ' + ({premier:'4 lessons a month',elite:'unlimited lessons plus recruiting guidance'})[t] + '.</p>';
         }
-        h += '<button type="button" class="quiz-back" id="quiz-retake">Retake the quiz</button><p class="quiz-note">Not sure? A free consult call will sort it out.</p>';
+        h += '<button type="button" class="quiz-back" id="quiz-retake">Retake the quiz</button>' + (yes ? '<p class="quiz-note">Not sure? A free consult call will sort it out.</p>' : '');
         body.innerHTML = h;
         document.getElementById('quiz-retake').addEventListener('click', function () { a = {}; step = 0; render(); });
       }
