@@ -1465,7 +1465,7 @@
     .quiz-fab[hidden] { display: none; }
     .quiz-form { text-align: left; max-width: 420px; margin: 0 auto; display: grid; gap: 12px; }
     .quiz-form label { font-family: var(--f-util); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--n-700); display: grid; gap: 6px; }
-    .quiz-form input[type=text], .quiz-form input[type=email] { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; text-transform: none; letter-spacing: 0; }
+    .quiz-form input[type=text], .quiz-form input[type=tel] { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; text-transform: none; letter-spacing: 0; }
     .quiz-form input:focus { border-color: var(--gold-400); outline: none; }
     .quiz-form .hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
     .quiz-fine { font-family: var(--f-body); font-size: 12px; color: var(--n-600); line-height: 1.5; text-transform: none; letter-spacing: 0; }
@@ -4096,7 +4096,7 @@
       var T = {
         premier: { n: 'Premier', p: '$350', inc: ['Unlimited facility access', 'Unlimited physical therapy and recovery services', 'Evaluation and individualized development plan', 'S&C, throwing, hitting and velocity programming', 'First access to camps and events'], note: 'Lessons are $50 each.' },
         elite: { n: 'Elite', p: '$500', inc: ['Everything in Premier', '4 lessons a month included (hitting development or pitching)', 'Evaluation and assessment included', 'Discounted lessons beyond the 4 included'] },
-        ultimate: { n: 'Ultimate', p: '$650', inc: ['Everything in Elite', '8 lessons a month included (hitting development or pitching)', 'Recruiting guidance with Trackman/Rapsodo data and video', 'Deepest discounts on gear and add-ons'] },
+        ultimate: { n: 'Ultimate', p: '$650', inc: ['Unlimited everything: lessons, facility access, physical therapy and recovery', 'Full individualized development plan', 'Recruiting guidance with Trackman/Rapsodo data and video', 'Deepest discounts on gear and add-ons'] },
         remote: { n: 'Remote Training', p: '', inc: ['Online evaluation and a custom program', 'Throwing programming, arm care, strength and recovery', 'Video review and coach feedback', 'Regular check-ins with your coach', 'In-person access included'] }
       };
       var order = ['premier', 'elite', 'ultimate'];
@@ -4112,7 +4112,7 @@
       function lessonWord() { return a.who === 'pitcher' ? 'pitching lessons' : a.who === 'hitter' ? 'hitting development sessions' : 'pitching and hitting lessons'; }
       function why(t) {
         var x = '';
-        if (t === 'ultimate') x = a.lessons === 'eight' ? 'You want about 8 ' + lessonWord() + ' a month, which Ultimate includes, along with recruiting guidance' : 'You want regular ' + lessonWord() + ' and help getting recruited, and Ultimate adds recruiting guidance with Trackman/Rapsodo data and video';
+        if (t === 'ultimate') x = a.lessons === 'eight' ? 'You want about 8 ' + lessonWord() + ' a month, and Ultimate is unlimited everything, with recruiting guidance included' : 'You want regular ' + lessonWord() + ' and help getting recruited, and Ultimate is unlimited everything, with recruiting guidance using Trackman/Rapsodo data and video';
         if (t === 'elite') x = 'You want about 4 ' + lessonWord() + ' a month, and Elite includes them along with the full development plan';
         if (t === 'premier') x = 'You get unlimited facility access, physical therapy and recovery, and a full individualized development plan' + (a.lessons === 'some' ? ', with lessons booked whenever you need one' : '');
         return x + '.';
@@ -4131,25 +4131,25 @@
       }
       function gate() {
         if (contact || !LEAD_ACCESS_KEY) return result();
-        body.innerHTML = '<div class="quiz-progress"><span style="width:100%"></span></div><div class="quiz-eyebrow">— Almost There —</div><div class="quiz-title" style="font-size:20px">Where should we send your match?</div><p class="quiz-sub">Enter your name and email to see your recommended membership. A coach may follow up to help you get started.</p>' +
-          '<form class="quiz-form" id="quiz-form" novalidate><label>Full name<input type="text" name="name" autocomplete="name" placeholder="First and last name" required></label><label>Email<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label><input class="hp" type="text" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="quiz-err" id="quiz-err" role="alert"></div><button type="submit" class="btn btn-primary" id="quiz-submit">See My Match →</button><p class="quiz-fine">We’ll only use your info to follow up about training at The Den × FCS. No spam.</p></form><button type="button" class="quiz-back" id="quiz-back">← Back</button>';
+        body.innerHTML = '<div class="quiz-progress"><span style="width:100%"></span></div><div class="quiz-eyebrow">— Almost There —</div><div class="quiz-title" style="font-size:20px">Where can we reach you?</div><p class="quiz-sub">Enter your name and phone number to see your recommended membership. A coach may reach out to help you get started.</p>' +
+          '<form class="quiz-form" id="quiz-form" novalidate><label>Full name<input type="text" name="name" autocomplete="name" placeholder="First and last name" required></label><label>Phone number<input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555" required></label><input class="hp" type="text" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="quiz-err" id="quiz-err" role="alert"></div><button type="submit" class="btn btn-primary" id="quiz-submit">See My Match →</button><p class="quiz-fine">We will only reach out for Den × FCS Training. No spam.</p></form><button type="button" class="quiz-back" id="quiz-back">← Back</button>';
         document.getElementById('quiz-back').addEventListener('click', function () { step = Q.length - 1; render(); });
         document.getElementById('quiz-form').addEventListener('submit', submit);
       }
       function submit(e) {
         e.preventDefault();
-        var f = e.target, name = f.name.value.trim(), email = f.email.value.trim(), err = document.getElementById('quiz-err'), btn = document.getElementById('quiz-submit');
+        var f = e.target, name = f.name.value.trim(), phone = f.phone.value.trim(), digits = phone.replace(/\D/g, ''), err = document.getElementById('quiz-err'), btn = document.getElementById('quiz-submit');
         if (f.botcheck.value) return;
         if (name.split(/\s+/).filter(Boolean).length < 2) { err.textContent = 'Please enter your first and last name.'; f.name.focus(); return; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { err.textContent = 'Please enter a valid email address.'; f.email.focus(); return; }
+        if (!(digits.length === 10 || (digits.length === 11 && digits.charAt(0) === '1'))) { err.textContent = 'Please enter a valid 10-digit phone number.'; f.phone.focus(); return; }
         err.textContent = ''; btn.disabled = true; btn.textContent = 'Sending…';
         var summary = Object.keys(LABEL).map(function (k) { return k + ': ' + (LABEL[k][a[k]] || a[k]); }).join('\n');
         fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({
-          access_key: LEAD_ACCESS_KEY, subject: 'New membership quiz lead: ' + name, from_name: 'Den × FCS Website Quiz', name: name, email: email,
-          recommended: recName(), message: 'Recommended: ' + recName() + '\n\n' + summary
+          access_key: LEAD_ACCESS_KEY, subject: 'New membership quiz lead: ' + name, from_name: 'Den × FCS Website Quiz', name: name, phone: phone,
+          recommended: recName(), message: 'Name: ' + name + '\nPhone: ' + phone + '\nRecommended: ' + recName() + '\n\n' + summary
         }) }).then(function (r) { return r.json(); }).then(function (d) {
           if (!d.success) throw new Error('fail');
-          contact = { name: name, email: email }; result();
+          contact = { name: name, phone: phone }; result();
         }).catch(function () {
           err.textContent = 'Something went wrong sending that. Please try again, or book a consult call instead.'; btn.disabled = false; btn.textContent = 'See My Match →';
         });
@@ -4168,7 +4168,7 @@
           if (T1.note) h += '<p class="quiz-also" style="margin-top:-8px;margin-bottom:16px;">' + esc(T1.note) + '</p>';
           h += '<div class="quiz-ctas"><a class="btn btn-primary" href="' + ACCOUNT + '" target="_blank" rel="noopener noreferrer">Create Your Account →</a><a class="btn btn-secondary" href="' + CONSULT + '" target="_blank" rel="noopener noreferrer">Book a Free Consult Call</a></div>';
           var i = order.indexOf(t);
-          if (i < order.length - 1) h += '<p class="quiz-also"><strong>Want more?</strong> ' + T[order[i + 1]].n + ' (' + T[order[i + 1]].p + '/mo) adds ' + ({premier:'4 lessons a month',elite:'8 lessons a month and recruiting guidance'})[t] + '.</p>';
+          if (i < order.length - 1) h += '<p class="quiz-also"><strong>Want more?</strong> ' + T[order[i + 1]].n + ' (' + T[order[i + 1]].p + '/mo) adds ' + ({premier:'4 lessons a month',elite:'unlimited everything plus recruiting guidance'})[t] + '.</p>';
         }
         h += '<button type="button" class="quiz-back" id="quiz-retake">Retake the quiz</button><p class="quiz-note">Not sure? A free consult call will sort it out.</p>';
         body.innerHTML = h;
