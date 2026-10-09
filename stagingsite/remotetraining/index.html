@@ -57,6 +57,26 @@
   .step-title { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--text); margin-top: 8px; }
   .step-desc { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 13px; color: var(--text-muted); margin-top: 8px; line-height: 1.6; }
 
+
+  /* FAQ carousel */
+  .faq-wrap { max-width: 720px; margin: 0 auto; }
+  .faq-card { position: relative; background: var(--dark-card); border: 1px solid #1E1E1E; border-top: 2px solid var(--gold); padding: 32px 28px 28px; min-height: 230px; display: flex; flex-direction: column; justify-content: center; }
+  .faq-slide { display: none; }
+  .faq-slide.active { display: block; animation: faqIn .45s ease; }
+  @keyframes faqIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .faq-q { font-family: 'Oswald', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: .5px; color: var(--text); line-height: 1.35; }
+  .faq-q::before { content: 'Q'; display: inline-block; margin-right: 12px; color: var(--gold); font-weight: 700; }
+  .faq-a { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 15px; color: var(--text-muted); line-height: 1.8; margin-top: 14px; }
+  .faq-a strong { color: var(--text); font-weight: 500; }
+  .faq-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+  .faq-arrow { background: transparent; border: 1px solid #3a3a3a; color: var(--text); width: 40px; height: 40px; cursor: pointer; font-size: 18px; line-height: 1; }
+  .faq-arrow:hover, .faq-arrow:focus-visible { border-color: var(--gold); color: var(--gold); outline: none; }
+  .faq-dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .faq-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--gold); background: transparent; padding: 0; cursor: pointer; }
+  .faq-dot.active { background: var(--gold); }
+  .faq-count { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 3px; font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 12px; text-transform: uppercase; }
+  @media (max-width: 700px) { .faq-card { padding: 26px 20px 22px; min-height: 280px; } .faq-q { font-size: 18px; } }
+
   @media (min-width: 640px) {
     .included-grid { grid-template-columns: repeat(2, 1fr); }
   }
@@ -235,6 +255,81 @@
     </div>
   </div>
 </div>
+
+<!-- FAQ -->
+<div class="section">
+  <div class="section-title">Frequently Asked Questions</div>
+  <div class="faq-wrap" id="faq" aria-roledescription="carousel" aria-label="Frequently asked questions">
+    <div class="faq-card" aria-live="off">
+      <div class="faq-slide active" role="group" aria-roledescription="slide" aria-label="1 of 9">
+        <div class="faq-q">Who is Remote Training for?</div>
+        <div class="faq-a">Pitchers, hitters, and two-way players who can’t get to a facility every week. Every program is built around <strong>your level, schedule, and the equipment you have access to</strong>.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="2 of 9">
+        <div class="faq-q">Do I need special equipment?</div>
+        <div class="faq-a">No. Your throwing, strength, and recovery work is programmed around <strong>whatever you have access to</strong>, so you can start from where you are.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="3 of 9">
+        <div class="faq-q">How do I get started?</div>
+        <div class="faq-a">Book a consult call and we’ll walk you through it. After you sign up, you complete an <strong>online evaluation</strong>, we build your custom program, and you start logging work in the PitchSafe app.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="4 of 9">
+        <div class="faq-q">Is there an evaluation?</div>
+        <div class="faq-a">Yes. Every athlete completes an <strong>online evaluation</strong> as part of onboarding, covering your background, goals, and current training setup. Your program is built from it.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="5 of 9">
+        <div class="faq-q">How do coaches track my progress?</div>
+        <div class="faq-a">You log your sessions and throws in the <strong>PitchSafe app</strong>. Coaches monitor your workload and progress from anywhere, review your work, and adjust the plan as you go.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="6 of 9">
+        <div class="faq-q">Can I get feedback on my mechanics?</div>
+        <div class="faq-a">Yes. Submit video of your throwing or your swing, and your coaches will break it down and send back <strong>targeted adjustments</strong>.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="7 of 9">
+        <div class="faq-q">Does it include arm care and throwing programming?</div>
+        <div class="faq-a">Yes. You get a structured throwing progression paired with <strong>dedicated arm care work</strong>, built to develop velocity and durability safely.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="8 of 9">
+        <div class="faq-q">Can I train in person too?</div>
+        <div class="faq-a">Yes. Your remote membership also covers <strong>in-person access at any DenFCS location at no surcharge</strong>, so you can blend remote programming with in-facility sessions whenever you’re able to come in.</div>
+      </div>
+      <div class="faq-slide" role="group" aria-roledescription="slide" aria-label="9 of 9">
+        <div class="faq-q">How do I talk to someone before signing up?</div>
+        <div class="faq-a">Book a consult call and we’ll answer your questions, talk through your goals, and help you decide if Remote Training is the right fit.</div>
+      </div>
+    </div>
+    <div class="faq-controls">
+      <button class="faq-arrow" id="faq-prev" aria-label="Previous question">&#8592;</button>
+      <div class="faq-dots"><button class="faq-dot active" aria-label="Show question 1"></button><button class="faq-dot" aria-label="Show question 2"></button><button class="faq-dot" aria-label="Show question 3"></button><button class="faq-dot" aria-label="Show question 4"></button><button class="faq-dot" aria-label="Show question 5"></button><button class="faq-dot" aria-label="Show question 6"></button><button class="faq-dot" aria-label="Show question 7"></button><button class="faq-dot" aria-label="Show question 8"></button><button class="faq-dot" aria-label="Show question 9"></button></div>
+      <button class="faq-arrow" id="faq-next" aria-label="Next question">&#8594;</button>
+    </div>
+    <div class="faq-count" id="faq-count">1 / 9</div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('faq'); if (!root) return;
+  var slides = root.querySelectorAll('.faq-slide'), dots = root.querySelectorAll('.faq-dot');
+  var count = document.getElementById('faq-count'), i = 0, timer = null, INTERVAL = 9000;
+  function show(n) {
+    i = (n + slides.length) % slides.length;
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    dots.forEach(function (d, k) { d.classList.toggle('active', k === i); });
+    count.textContent = (i + 1) + ' / ' + slides.length;
+  }
+  function start() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    stop(); timer = setInterval(function () { show(i + 1); }, INTERVAL);
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  document.getElementById('faq-prev').addEventListener('click', function () { show(i - 1); start(); });
+  document.getElementById('faq-next').addEventListener('click', function () { show(i + 1); start(); });
+  dots.forEach(function (d, k) { d.addEventListener('click', function () { show(k); start(); }); });
+  root.addEventListener('mouseenter', stop); root.addEventListener('mouseleave', start);
+  root.addEventListener('focusin', stop); root.addEventListener('focusout', start);
+  start();
+})();
+</script>
 
 <div class="cta">
   <h2 style="font-family:'Oswald',sans-serif; font-weight:600; font-size:26px; letter-spacing:1px; color:var(--text); margin-bottom:12px;">Ready to Start Training?</h2>
