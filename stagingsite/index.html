@@ -1475,6 +1475,26 @@
     .quiz-stagewarn { background: #3a1410; border: 1px solid #ff8a7a; color: #ffb4a8; font-family: var(--f-util); font-size: 11px; letter-spacing: 0.05em; padding: 8px 10px; border-radius: 4px; margin-bottom: 14px; text-transform: none; }
     @media (max-width: 640px) { .quiz-fab { right: 14px; bottom: 14px; padding: 12px 16px; } }
 
+
+    /* ---------- Homepage revolving FAQ ---------- */
+    .hfaq-wrap { max-width: 720px; margin: 0 auto; padding: 0 var(--sp-xl); }
+    .hfaq-card { background: var(--n-100); border: 1px solid var(--n-300); border-top: 2px solid var(--gold-400); border-radius: 8px; padding: 36px 32px; min-height: 280px; display: flex; flex-direction: column; justify-content: center; }
+    .hfaq-slide { display: none; }
+    .hfaq-slide.active { display: block; animation: hfaqIn .45s ease; }
+    @keyframes hfaqIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .hfaq-q { font-family: var(--f-head); font-weight: 700; font-size: 19px; line-height: 1.4; color: var(--n-1000); }
+    .hfaq-a { font-family: var(--f-body); font-weight: 300; font-size: 17px; line-height: 1.75; color: var(--n-800); margin-top: 16px; text-transform: none; letter-spacing: 0; }
+    .hfaq-a strong { color: var(--n-1000); font-weight: 600; }
+    .hfaq-a a { color: var(--gold-400); }
+    .hfaq-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; }
+    .hfaq-arrow { background: transparent; border: 1px solid var(--n-400); color: var(--n-900); width: 44px; height: 44px; border-radius: 4px; cursor: pointer; font-size: 18px; line-height: 1; }
+    .hfaq-arrow:hover, .hfaq-arrow:focus-visible { border-color: var(--gold-400); color: var(--gold-400); outline: none; }
+    .hfaq-dots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .hfaq-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--gold-400); background: transparent; padding: 0; cursor: pointer; }
+    .hfaq-dot.active { background: var(--gold-400); }
+    .hfaq-count { font-family: var(--f-util); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--n-600); text-align: center; margin-top: 14px; }
+    @media (max-width: 640px) { .hfaq-wrap { padding: 0 var(--sp-md); } .hfaq-card { padding: 26px 20px; min-height: 340px; } .hfaq-q { font-size: 17px; } .hfaq-a { font-size: 16px; } }
+
     .tier-fallback {
       max-width: 640px;
       margin: var(--sp-3xl) auto 0;
@@ -3444,6 +3464,55 @@
     </div>
   </section>
 
+  <section class="hfaq section" id="faq">
+    <div class="section-header">
+      <div class="eyebrow">— FAQ —</div>
+      <h2><span>Common </span><em class="accent">Questions.</em></h2>
+    </div>
+    <div class="hfaq-wrap" id="hfaq" aria-roledescription="carousel" aria-label="Frequently asked questions">
+      <div class="hfaq-card">
+          <div class="hfaq-slide active" role="group" aria-roledescription="slide" aria-label="1 of 8">
+            <div class="hfaq-q">Which membership is right for me?</div>
+            <div class="hfaq-a">Take the <strong>Find Your Fit quiz</strong> (the gold button at the bottom of the page) or book a free consult call, and we’ll point you to the right fit based on your position, your biggest limitation, and how often you can come in.</div>
+          </div>
+          <div class="hfaq-slide" role="group" aria-roledescription="slide" aria-label="2 of 8">
+            <div class="hfaq-q">Is there a commitment?</div>
+            <div class="hfaq-a">Yes. Enrollment is a binding commitment for a <strong>minimum of 3 consecutive months</strong>. There are no refunds, pauses, or prorations, which lets us plan staffing, programming, and evaluations for every athlete.</div>
+          </div>
+          <div class="hfaq-slide" role="group" aria-roledescription="slide" aria-label="3 of 8">
+            <div class="hfaq-q">How do I sign up?</div>
+            <div class="hfaq-a">Create your account at <a href="https://team.thedenfcs.com" target="_blank" rel="noopener noreferrer">team.thedenfcs.com</a>, or <a href="https://calendly.com/jrichey09/30min" target="_blank" rel="noopener noreferrer">book a free consult call</a> and we’ll set it up together.</div>
+          </div>
+          <div class="hfaq-slide" role="group" aria-roledescription="slide" aria-label="4 of 8">
+            <div class="hfaq-q">Where are you located?</div>
+            <div class="hfaq-a">We have two locations: <strong>Den × FCS Porter</strong> (20134 Olds Dr, Porter, TX 77365) and <strong>Den × FCS at Baseball USA</strong> in West Houston (2626 W Sam Houston Pkwy N, Houston, TX 77043).</div>
+          </div>
+          <div class="hfaq-slide" role="group" aria-roledescription="slide" aria-label="5 of 8">
+            <div class="hfaq-q">What’s included in Premier?</div>
+            <div class="hfaq-a">Unlimited facility access, unlimited physical therapy and recovery services, an evaluation and individualized development plan, S&amp;C, throwing, hitting and velocity programming, and first access to camps and events.</div>
+          </div>
+          <div class="hfaq-slide" role="group" aria-roledescription="slide" aria-label="6 of 8">
+            <div class="hfaq-q">How do lessons work?</div>
+            <div class="hfaq-a">Lessons are either hitting development sessions or individual pitching sessions. On <strong>Premier they’re $50 each</strong>. Elite and Ultimate include lessons as part of the membership, with discounts beyond what’s included.</div>
+          </div>
+          <div class="hfaq-slide" role="group" aria-roledescription="slide" aria-label="7 of 8">
+            <div class="hfaq-q">Can I train remotely?</div>
+            <div class="hfaq-a">Yes. Our <a href="/remotetraining/">Remote Training</a> program is built for pitchers who can’t get to a facility regularly. You get a custom program, video feedback, and regular check-ins with your coach.</div>
+          </div>
+          <div class="hfaq-slide" role="group" aria-roledescription="slide" aria-label="8 of 8">
+            <div class="hfaq-q">Is the consultation really free?</div>
+            <div class="hfaq-a">Yes. A consult call is free and there’s no pressure. We’ll talk through your goals and help you decide which membership fits.</div>
+          </div>
+      </div>
+      <div class="hfaq-controls">
+        <button type="button" class="hfaq-arrow" id="hfaq-prev" aria-label="Previous question">&#8592;</button>
+        <div class="hfaq-dots"><button type="button" class="hfaq-dot active" aria-label="Show question 1"></button><button type="button" class="hfaq-dot" aria-label="Show question 2"></button><button type="button" class="hfaq-dot" aria-label="Show question 3"></button><button type="button" class="hfaq-dot" aria-label="Show question 4"></button><button type="button" class="hfaq-dot" aria-label="Show question 5"></button><button type="button" class="hfaq-dot" aria-label="Show question 6"></button><button type="button" class="hfaq-dot" aria-label="Show question 7"></button><button type="button" class="hfaq-dot" aria-label="Show question 8"></button></div>
+        <button type="button" class="hfaq-arrow" id="hfaq-next" aria-label="Next question">&#8594;</button>
+      </div>
+      <div class="hfaq-count" id="hfaq-count">1 / 8</div>
+    </div>
+  </section>
+
   <section class="locations section" id="locations">
     <div class="section-header">
       <div class="eyebrow">— Locations —</div>
@@ -4202,6 +4271,29 @@
       fab.hidden = false;
       var seen = false; try { seen = sessionStorage.getItem('quizSeen') === '1'; } catch (e) {}
       if (!seen) setTimeout(function () { if (!modal.classList.contains('open')) open(); }, AUTO_OPEN_MS);
+    })();
+
+    /* ---------- Homepage revolving FAQ ---------- */
+    (function () {
+      var root = document.getElementById('hfaq'); if (!root) return;
+      var slides = root.querySelectorAll('.hfaq-slide'), dots = root.querySelectorAll('.hfaq-dot'), count = document.getElementById('hfaq-count'), i = 0, timer = null;
+      function show(n) {
+        i = (n + slides.length) % slides.length;
+        slides.forEach(function (x, k) { x.classList.toggle('active', k === i); });
+        dots.forEach(function (d, k) { d.classList.toggle('active', k === i); });
+        count.textContent = (i + 1) + ' / ' + slides.length;
+      }
+      function stop() { if (timer) { clearInterval(timer); timer = null; } }
+      function start() {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        stop(); timer = setInterval(function () { show(i + 1); }, 10000);
+      }
+      document.getElementById('hfaq-prev').addEventListener('click', function () { show(i - 1); start(); });
+      document.getElementById('hfaq-next').addEventListener('click', function () { show(i + 1); start(); });
+      dots.forEach(function (d, k) { d.addEventListener('click', function () { show(k); start(); }); });
+      root.addEventListener('mouseenter', stop); root.addEventListener('mouseleave', start);
+      root.addEventListener('focusin', stop); root.addEventListener('focusout', start);
+      start();
     })();
 
     const pins = document.querySelectorAll('.pin');
