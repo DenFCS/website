@@ -1464,7 +1464,7 @@
     .quiz-fab[hidden] { display: none; }
     .quiz-form { text-align: left; max-width: 420px; margin: 0 auto; display: grid; gap: 12px; }
     .quiz-form label { font-family: var(--f-util); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--n-700); display: grid; gap: 6px; }
-    .quiz-form input[type=text], .quiz-form input[type=email] { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; text-transform: none; letter-spacing: 0; }
+    .quiz-form input[type=text], .quiz-form input[type=email], .quiz-form input[type=tel] { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; text-transform: none; letter-spacing: 0; }
     .quiz-form input:focus { border-color: var(--gold-400); outline: none; }
     .quiz-text { font-family: var(--f-body); font-size: 17px; color: var(--n-1000); background: var(--n-50); border: 1px solid var(--n-300); border-radius: 6px; padding: 13px 14px; width: 100%; resize: vertical; text-transform: none; letter-spacing: 0; margin-bottom: 4px; }
     .quiz-text:focus { border-color: var(--gold-400); outline: none; }
@@ -4209,25 +4209,26 @@
       }
       function gate() {
         if (contact || !LEAD_ACCESS_KEY) return result();
-        body.innerHTML = '<div class="quiz-progress"><span style="width:100%"></span></div><div class="quiz-eyebrow">— Almost There —</div><div class="quiz-title" style="font-size:20px">Where can we reach you?</div><p class="quiz-sub">Enter your name and email to see your recommended membership. A coach may reach out to help you get started.</p>' +
-          '<form class="quiz-form" id="quiz-form" novalidate><label>Full name<input type="text" name="name" autocomplete="name" placeholder="First and last name" required></label><label>Email<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label><input class="hp" type="text" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="quiz-err" id="quiz-err" role="alert"></div><button type="submit" class="btn btn-primary" id="quiz-submit">See My Match →</button><p class="quiz-fine">We will only reach out for Den × FCS Training. No spam.</p></form><button type="button" class="quiz-back" id="quiz-back">← Back</button>';
+        body.innerHTML = '<div class="quiz-progress"><span style="width:100%"></span></div><div class="quiz-eyebrow">— Almost There —</div><div class="quiz-title" style="font-size:20px">Where can we reach you?</div><p class="quiz-sub">Enter your name, email and phone number to see your recommended membership. A coach may reach out to help you get started.</p>' +
+          '<form class="quiz-form" id="quiz-form" novalidate><label>Full name<input type="text" name="name" autocomplete="name" placeholder="First and last name" required></label><label>Email<input type="email" name="email" autocomplete="email" placeholder="you@example.com" required></label><label>Phone number<input type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(555) 555-5555" required></label><input class="hp" type="text" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="quiz-err" id="quiz-err" role="alert"></div><button type="submit" class="btn btn-primary" id="quiz-submit">See My Match →</button><p class="quiz-fine">We will only reach out for Den × FCS Training. No spam.</p></form><button type="button" class="quiz-back" id="quiz-back">← Back</button>';
         document.getElementById('quiz-back').addEventListener('click', function () { step = Q.length - 1; render(); });
         document.getElementById('quiz-form').addEventListener('submit', submit);
       }
       function submit(e) {
         e.preventDefault();
-        var f = e.target, name = f.name.value.trim(), email = f.email.value.trim(), err = document.getElementById('quiz-err'), btn = document.getElementById('quiz-submit');
+        var f = e.target, name = f.name.value.trim(), email = f.email.value.trim(), phone = f.phone.value.trim(), digits = phone.replace(/\D/g, ''), err = document.getElementById('quiz-err'), btn = document.getElementById('quiz-submit');
         if (f.botcheck.value) return;
         if (name.split(/\s+/).filter(Boolean).length < 2) { err.textContent = 'Please enter your first and last name.'; f.name.focus(); return; }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { err.textContent = 'Please enter a valid email address.'; f.email.focus(); return; }
+        if (!(digits.length === 10 || (digits.length === 11 && digits.charAt(0) === '1'))) { err.textContent = 'Please enter a valid 10-digit phone number.'; f.phone.focus(); return; }
         err.textContent = ''; btn.disabled = true; btn.textContent = 'Sending…';
         var summary = Object.keys(LABEL).map(function (k) { return (k === 'help') ? ('How can we help: ' + (a.help || '(left blank)')) : (k + ': ' + (LABEL[k][a[k]] || a[k])); }).join('\n');
         fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({
-          access_key: LEAD_ACCESS_KEY, subject: 'New membership quiz lead: ' + name + (a.consult === 'yes' ? ' (wants a consult call)' : ''), from_name: 'Den × FCS Website Quiz', name: name, email: email,
-          recommended: recName(), message: 'Name: ' + name + '\nEmail: ' + email + '\nOpen to consult call: ' + (LABEL.consult[a.consult] || a.consult) + '\nRecommended: ' + recName() + '\n\n' + summary
+          access_key: LEAD_ACCESS_KEY, subject: 'New membership quiz lead: ' + name + (a.consult === 'yes' ? ' (wants a consult call)' : ''), from_name: 'Den × FCS Website Quiz', name: name, email: email, phone: phone,
+          recommended: recName(), message: 'Name: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\nOpen to consult call: ' + (LABEL.consult[a.consult] || a.consult) + '\nRecommended: ' + recName() + '\n\n' + summary
         }) }).then(function (r) { return r.json(); }).then(function (d) {
           if (!d.success) throw new Error('fail');
-          contact = { name: name, email: email }; result();
+          contact = { name: name, email: email, phone: phone }; result();
         }).catch(function () {
           err.textContent = 'Something went wrong sending that. Please try again, or book a consult call instead.'; btn.disabled = false; btn.textContent = 'See My Match →';
         });
