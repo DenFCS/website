@@ -149,7 +149,7 @@
   .included-desc { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
 
   /* TIERS */
-  .tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
   .tier { background: var(--dark-card); border: 1px solid #222; padding: 28px 20px; text-align: center; position: relative; transition: border-color 0.3s; }
   .tier:hover { border-color: var(--gold); }
   .tier.featured { border-color: var(--gold); background: linear-gradient(180deg, rgba(200,168,78,0.06) 0%, var(--dark-card) 100%); }
@@ -202,7 +202,7 @@
   .footer-text { font-family: 'Barlow', sans-serif; font-weight: 300; font-size: 12px; color: var(--text-muted); letter-spacing: 1px; line-height: 1.8; }
 
   @media (max-width: 900px) {
-    .tiers { grid-template-columns: repeat(2, 1fr); }
+    .tiers { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 768px) {
     .tiers, .discounts, .locations { grid-template-columns: 1fr; }
@@ -384,25 +384,10 @@
 
 <!-- PRICING -->
 <div class="section">
-  <div class="section-title">Four Plans. One Commitment.</div>
+  <div class="section-title">Three Plans. One Commitment.</div>
   <div class="tiers">
     <div class="tier">
-      <div class="tier-name">Tier 01 — Access</div>
-      <div class="tier-subtitle">The required base — every athlete needs this or higher.</div>
-      <div class="tier-price"><span>$125</span><span>/mo</span></div>
-      <div class="tier-note">Required to book lessons</div>
-      <div class="tier-total">$375 total commitment</div>
-      <div class="tier-pif"><br></div>
-      <div class="tier-includes-label">Includes</div>
-      <ul class="tier-includes">
-        <li>Facility workout access during lesson days</li>
-        <li>Recovery access during lesson days</li>
-        <li>Extra swings on lesson days</li>
-        <li>Discounted gloves, bats, and relacing</li>
-      </ul>
-    </div>
-    <div class="tier">
-      <div class="tier-name">Tier 02 — Premier</div>
+      <div class="tier-name">Tier 01 — Premier</div>
       <div class="tier-subtitle">Full access, no lessons included.</div>
       <div class="tier-price"><span>$350</span><span>/mo</span></div>
       <div class="tier-note">pitching Lessons at $50 each</div>
@@ -419,7 +404,7 @@
       </ul>
     </div>
     <div class="tier featured">
-      <div class="tier-name">Tier 03 — Elite</div>
+      <div class="tier-name">Tier 02 — Elite</div>
       <div class="tier-subtitle">Strong training package for serious development.</div>
       <div class="tier-price"><span>$500</span><span>/mo</span></div>
       <div class="tier-note">4 lessons/mo included — hitting or pitching</div>
@@ -435,7 +420,7 @@
       </ul>
     </div>
     <div class="tier">
-      <div class="tier-name">Tier 04 — Ultimate</div>
+      <div class="tier-name">Tier 03 — Ultimate</div>
       <div class="tier-subtitle">Top-tier, all-access membership.</div>
       <div class="tier-price"><span>$650</span><span>/mo</span></div>
       <div class="tier-note">Unlimited pitching and hitting lessons</div>
@@ -451,7 +436,7 @@
     </div>
   </div>
   <div class="no-lessons">
-    <p><strong>Access is required for any facility use.</strong><span> Lessons can be booked individually on Access &amp; Premier ($50 each) or come included on Elite (4/mo) and Ultimate (unlimited). Lessons are either Hitting Development Sessions and or Individual Pitching Sessions. Every athlete above Access gets an individualized development plan built into their membership.&nbsp;</span></p>
+    <p><strong>A membership is required for any facility use.</strong><span> Lessons can be booked individually on Premier ($50 each) or come included on Elite (4/mo) and Ultimate (unlimited). Lessons are either Hitting Development Sessions and or Individual Pitching Sessions. Every athlete gets an individualized development plan built into their membership.&nbsp;</span></p>
     <p><strong>Evaluations:</strong><span> Evaluation &amp; assessment is not included on Premier or Elite. It costs $120 per evaluation on Premier and $60 on Elite (50% off). It is included free on Ultimate.</span></p>
   </div>
 </div>
